@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rooms', function (Blueprint $table) {
+        Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('slug')->unique();
-            $table->text('description')->nullable();
-            $table->boolean('is_private')->default(false);
-            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
+            $table->text('content');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('room_id')->constrained()->onDelete('cascade');
+            $table->timestamp('edited_at')->nullable();
             $table->timestamps();
+
+            $table->index(['room_id', 'created_at']);
         });
     }
 
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rooms');
+        Schema::dropIfExists('messages');
     }
 };
