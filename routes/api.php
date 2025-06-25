@@ -99,3 +99,8 @@ Route::fallback(function () {
         'documentation' => '/api/v1/status'
     ], 404);
 });
+use Illuminate\Support\Facades\Broadcast;
+
+Broadcast::routes(['middleware' => ['auth']]
+);
+

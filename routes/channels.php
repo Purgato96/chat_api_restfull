@@ -20,8 +20,10 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 
 // Canal privado de sala (para usuários autenticados via web)
 Broadcast::channel('room.{roomId}', function ($user, $roomId) {
-    // Verifica se o usuário tem acesso à sala
-    return $user->rooms()->where('room_id', $roomId)->exists();
+    \Log::info("Verificando acesso do usuário {$user->id} à sala {$roomId}");
+    $acesso = $user->rooms()->where('room_id', $roomId)->exists();
+    \Log::info("Resultado da verificação: " . ($acesso ? 'Permitido' : 'Negado'));
+    return $acesso;
 });
 
 // Canal privado de sala (para clientes externos via API)
@@ -61,3 +63,5 @@ Broadcast::channel('presence-room.{roomId}', function ($user, $roomId) {
 });
 
 // Canais públicos não precisam de autorização (definidos no evento)
+Broadcast::routes(['middleware' => ['auth']]
+);

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\RoomController;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -12,6 +13,7 @@ Route::get('/', function () {
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
 
 Route::middleware(array_filter([
     'auth:sanctum',
@@ -25,9 +27,24 @@ Route::middleware(array_filter([
     // Chat Routes
     Route::prefix('chat')->group(function () {
         Route::get('/', [RoomController::class, 'index'])->name('rooms.index');
-        // demais rotas comentadas...
+        Route::post('/rooms', [RoomController::class, 'store'])->name('rooms.store');
+        Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('rooms.show');
+        Route::post('/rooms/{room}/join', [RoomController::class, 'join'])->name('rooms.join');
+        Route::delete('/rooms/{room}/leave', [RoomController::class, 'leave'])->name('rooms.leave');
+        Route::post('/rooms/{room}/users', [RoomController::class, 'addUser'])->name('rooms.addUser');
+        Route::post('/rooms/{room}/users/email', [RoomController::class, 'addUserByEmail'])->name('rooms.addUserByEmail');
+        Route::delete('/rooms/{room}/users/{userId}', [RoomController::class, 'removeUser'])->name('rooms.removeUser');
+        Route::get('/rooms/{room}/available-users', [RoomController::class, 'getAvailableUsers'])->name('rooms.availableUsers');
+        Route::post('/rooms/{room}/messages', [MessageController::class, 'store'])->name('messages.store');
+        Route::put('/messages/{message}', [MessageController::class, 'update'])->name('messages.update');
+        Route::delete('/messages/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
     });
 });
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
+
+use Illuminate\Support\Facades\Broadcast;
+
+Broadcast::routes(['middleware' => ['auth']]
+);
