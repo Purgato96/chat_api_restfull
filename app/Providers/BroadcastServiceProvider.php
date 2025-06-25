@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Broadcast;
 
 class BroadcastServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,10 @@ class BroadcastServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Registrar as rotas de broadcasting com o middleware 'auth:sanctum' ou 'auth' para proteger o endpoint de autenticação
+        Broadcast::routes(['middleware' => ['auth:sanctum']]);
+
+        // Registrar os canais definidos em routes/channels.php
+        require base_path('routes/channels.php');
     }
 }

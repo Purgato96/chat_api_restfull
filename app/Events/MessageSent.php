@@ -4,44 +4,37 @@ namespace App\Events;
 
 use App\Models\Message;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Broadcasting\PrivateChannel;  // ou use Channel se público
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 class MessageSent implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use SerializesModels;
 
-    public function __construct(
-        public Message $message
-    ) {}
+    public $id;
+    public $content;
+    public $user;
+    public $room_id;
+    public $created_at;
+    public $edited_at;
 
-    public function broadcastOn(): array
+    public function __construct(Message $message)
     {
-        return [
-            new PrivateChannel('room.' . $this->message->room_id),
-        ];
+        $this->id = $message->id;
+        $this->content = $message->content;
+        $this->user = $message->user;
+        $this->room_id = $message->room_id;
+        $this->created_at = $message->created_at;
+        $this->edited_at = $message->edited_at;
     }
 
-    public function broadcastWith(): array
+    public function broadcastOn()
     {
-        return [
-            'id' => $this->message->id,
-            'content' => $this->message->content,
-            'user' => [
-                'id' => $this->message->user->id,
-                'name' => $this->message->user->name,
-            ],
-            'room_id' => $this->message->room_id,
-            'created_at' => $this->message->created_at->toISOString(),
-            'edited_at' => $this->message->edited_at?->toISOString(),
-        ];
+        return new PrivateChannel('chat.' . $this->message->receiver_id);
     }
 
-    public function broadcastAs(): string
+    public function broadcastAs()
     {
         return 'message.sent';
     }

@@ -2,72 +2,66 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\MessageSent;
-use App\Models\Message;
 use App\Models\Room;
+use App\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Events\MessageSent;
 
 class MessageController extends Controller
 {
     public function store(Request $request, Room $room)
     {
-        // Verifica se o usuário tem acesso à sala
-        if (!$room->users()->where('user_id', auth()->id())->exists()) {
-            abort(403, 'Você não tem acesso a esta sala.');
-        }
-
         $validated = $request->validate([
-            'content' => 'required|string|max:2000',
+            'content' => 'required|string|max:1000',
         ]);
 
-        $message = Message::create([
+        $message = $room->messages()->create([
             'content' => $validated['content'],
             'user_id' => auth()->id(),
-            'room_id' => $room->id,
         ]);
 
         $message->load('user');
 
-        // Dispara o evento de broadcasting
         broadcast(new MessageSent($message))->toOthers();
 
-        return response()->json([
-            'message' => $message,
-        ]);
+        // 🚨 ESSA PARTE É A CHAVE:
+        if ($request->expectsJson() || $request->wantsJson()) {
+            return response()->json([
+                'message' => $message,
+            ]);
+        }
+
+        // fallback pra requisição Inertia (form tradicional)
+        return redirect()->back();
     }
 
     public function update(Request $request, Message $message)
     {
-        // Verifica se o usuário é o autor da mensagem
-        if ($message->user_id !== auth()->id()) {
-            abort(403, 'Você só pode editar suas próprias mensagens.');
-        }
+        $this->authorize('update', $message);
 
-        $validated = $request->validate([
-            'content' => 'required|string|max:2000',
+        $request->validate([
+            'content' => 'required|string|max:1000',
         ]);
 
         $message->update([
-            'content' => $validated['content'],
+            'content' => $request->content,
             'edited_at' => now(),
         ]);
 
-        return response()->json([
-            'message' => $message->fresh('user'),
-        ]);
+        broadcast(new MessageSent($message))->toOthers();
+
+        return response()->json(['message' => $message]);
     }
 
     public function destroy(Message $message)
     {
-        // Verifica se o usuário é o autor da mensagem
-        if ($message->user_id !== auth()->id()) {
-            abort(403, 'Você só pode deletar suas próprias mensagens.');
-        }
+        $this->authorize('delete', $message);
 
         $message->delete();
 
-        return response()->json([
-            'success' => true,
-        ]);
+        broadcast(new \App\Events\MessageDeleted($message->id))->toOthers();
+
+        return response()->json(['deleted' => true]);
     }
 }
