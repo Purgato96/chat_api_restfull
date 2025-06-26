@@ -21,11 +21,9 @@ class MessageSentApi implements ShouldBroadcast
 
     public function broadcastOn(): array
     {
-        return [
-            new PrivateChannel('room.' . $this->message->room_id),
-            new Channel('public.room.' . $this->message->room_id), // Canal público para clientes externos
-        ];
+        return [new PrivateChannel('room.' . $this->message->slug)];
     }
+
 
     public function broadcastWith(): array
     {

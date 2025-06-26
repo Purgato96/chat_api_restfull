@@ -46,5 +46,5 @@ require __DIR__.'/auth.php';
 
 use Illuminate\Support\Facades\Broadcast;
 
-Broadcast::routes(['middleware' => ['auth']]
-);
+// ✅ Middleware correto para autenticação via Laravel Sanctum
+Broadcast::routes(['middleware' => ['auth:sanctum']]);

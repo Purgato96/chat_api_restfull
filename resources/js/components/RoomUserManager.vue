@@ -1,16 +1,16 @@
 <template>
-  <div class="bg-white rounded-lg shadow p-6">
+  <div class="bg-white text-black rounded-lg shadow p-6">
     <h3 class="text-lg font-semibold mb-4">Gerenciar Usuários da Sala</h3>
-    
+
     <!-- Adicionar usuário por email -->
     <div class="mb-6">
-      <h4 class="text-md font-medium mb-2">Adicionar Usuário</h4>
+      <h4 class="text-md text-black font-medium mb-2">Adicionar Usuário</h4>
       <form @submit.prevent="addUserByEmail" class="flex gap-2">
         <input
           v-model="newUserEmail"
           type="email"
           placeholder="Email do usuário"
-          class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="flex-1 text-black px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
         <button
@@ -50,7 +50,7 @@
               </p>
             </div>
           </div>
-          
+
           <!-- Botão de remover (apenas para não-criadores) -->
           <button
             v-if="user.id !== room.created_by && canManageUsers"
@@ -69,7 +69,7 @@
       v-if="showRemoveModal"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
-      <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+      <div class="bg-white  rounded-lg p-6 max-w-md w-full mx-4">
         <h3 class="text-lg font-semibold mb-4">Confirmar Remoção</h3>
         <p class="text-gray-600 mb-6">
           Tem certeza que deseja remover este usuário da sala?
@@ -95,8 +95,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { ref, computed, onMounted } from 'vue'
+import { router, usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
   room: {
@@ -104,6 +104,7 @@ const props = defineProps({
     required: true
   }
 })
+const { props: pageProps } = usePage()
 
 const newUserEmail = ref('')
 const isLoading = ref(false)
@@ -114,7 +115,7 @@ const userToRemove = ref(null)
 
 // Verifica se o usuário atual pode gerenciar usuários (é o criador)
 const canManageUsers = computed(() => {
-  return props.room.created_by === window.Laravel?.user?.id
+  return props.room.created_by === pageProps.auth.user.id
 })
 
 const addUserByEmail = async () => {
@@ -125,7 +126,7 @@ const addUserByEmail = async () => {
   addUserSuccess.value = ''
 
   try {
-    await router.post(route('rooms.addUserByEmail', props.room.id), {
+    await router.post(route('rooms.addUserByEmail', { room: props.room.slug }), {
       email: newUserEmail.value
     }, {
       preserveState: true,
@@ -174,5 +175,9 @@ const confirmRemoveUser = async () => {
     isLoading.value = false
   }
 }
+onMounted(() => {
+    console.log('ID da sala:', props.room.slug)
+    console.log('URL da rota:', route('rooms.addUserByEmail', props.room.slug))
+})
 </script>
 

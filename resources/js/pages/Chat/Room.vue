@@ -19,6 +19,13 @@
                                     <span v-else class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                     Pública
                   </span>
+                                    <!-- Indicador de conexão -->
+                                    <span
+                                        :class="connectionStatus === 'connected' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                        class="px-2 py-1 text-xs rounded-full"
+                                    >
+                    {{ connectionStatus === 'connected' ? '🟢 Online' : '🔴 Offline' }}
+                  </span>
                                 </div>
                             </div>
 
@@ -50,7 +57,7 @@
                             <!-- Área de mensagens -->
                             <div ref="messagesContainer" class="flex-1 overflow-y-auto p-6 space-y-4">
                                 <div
-                                    v-for="message in messages"
+                                    v-for="message in localMessages"
                                     :key="message.id"
                                     class="flex items-start space-x-3"
                                 >
@@ -155,8 +162,8 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onMounted } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { router, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import RoomUserManager from '@/components/RoomUserManager.vue'
 
@@ -170,11 +177,16 @@ const props = defineProps({
         required: true
     }
 })
+const { props: pageProps } = usePage()
 
 const newMessage = ref('')
 const isSending = ref(false)
 const messagesContainer = ref(null)
 const showUserManager = ref(false)
+const connectionStatus = ref('disconnected')
+
+// Mensagens locais (incluindo as recebidas via broadcasting)
+const localMessages = ref([...props.messages])
 
 // Edição de mensagem
 const editingMessage = ref(null)
@@ -182,7 +194,7 @@ const editMessageContent = ref('')
 
 // Verifica se o usuário atual pode gerenciar usuários (é o criador)
 const canManageUsers = computed(() => {
-    return props.room.created_by === window.Laravel?.user?.id
+    return props.room.created_by === pageProps.auth.user.id
 })
 
 const sendMessage = async () => {
@@ -223,7 +235,7 @@ const updateMessage = async () => {
     isSending.value = true
 
     try {
-        await router.put(route('messages.update', editingMessage.value.id), {
+        await router.put(route('messages.update', editingMessage.value.slug), {
             content: editMessageContent.value
         }, {
             preserveState: true,
@@ -243,7 +255,13 @@ const deleteMessage = async (messageId) => {
 
     try {
         await router.delete(route('messages.destroy', messageId), {
-            preserveState: true
+            preserveState: true,
+            onSuccess: () => {
+                const index = localMessages.value.findIndex(msg => msg.id === messageId)
+                if (index !== -1) {
+                    localMessages.value.splice(index, 1)
+                }
+            }
         })
     } catch (error) {
         console.error('Erro ao excluir mensagem:', error)
@@ -254,7 +272,7 @@ const leaveRoom = async () => {
     if (!confirm('Tem certeza que deseja sair desta sala?')) return
 
     try {
-        await router.delete(route('rooms.leave', props.room.id))
+        await router.delete(route('rooms.leave', props.room.slug))
     } catch (error) {
         console.error('Erro ao sair da sala:', error)
     }
@@ -275,7 +293,58 @@ const scrollToBottom = () => {
     })
 }
 
+let echoChannel = null
+
+const setupEcho = () => {
+    if (!window.Echo) {
+        console.error('❌ Laravel Echo não está disponível')
+        return
+    }
+
+    console.log('🚀 Configurando Laravel Echo para a sala:', props.room.slug)
+
+    echoChannel = window.Echo.private(`room.${props.room.slug}`)
+        .listen('message.sent', (message) => {
+            console.log('📨 Nova mensagem recebida via broadcasting:', message)
+            localMessages.value.push(message)
+            scrollToBottom()
+        })
+        .subscribed(() => {
+            console.log('✅ Inscrito no canal da sala com sucesso')
+            connectionStatus.value = 'connected'
+        })
+        .error((error) => {
+            console.error('❌ Erro no canal da sala:', error)
+            connectionStatus.value = 'disconnected'
+        })
+
+    if (window.Echo.connector?.pusher?.connection) {
+        window.Echo.connector.pusher.connection.bind('connected', () => {
+            console.log('✅ Pusher conectado')
+            connectionStatus.value = 'connected'
+        })
+
+        window.Echo.connector.pusher.connection.bind('disconnected', () => {
+            console.log('❌ Pusher desconectado')
+            connectionStatus.value = 'disconnected'
+        })
+    }
+}
+
+const cleanupEcho = () => {
+    if (echoChannel) {
+        window.Echo.leave(`room.${props.room.slug}`)
+        echoChannel = null
+        console.log('🧹 Canal desconectado')
+    }
+}
+
 onMounted(() => {
     scrollToBottom()
+    setTimeout(setupEcho, 100)
+})
+
+onUnmounted(() => {
+    cleanupEcho()
 })
 </script>

@@ -12,21 +12,11 @@ class MessageSent implements ShouldBroadcast
 {
     use SerializesModels;
 
-    public $id;
-    public $content;
-    public $user;
-    public $room_id;
-    public $created_at;
-    public $edited_at;
+    public $message;
 
     public function __construct(Message $message)
     {
-        $this->id = $message->id;
-        $this->content = $message->content;
-        $this->user = $message->user;
-        $this->room_id = $message->room_id;
-        $this->created_at = $message->created_at;
-        $this->edited_at = $message->edited_at;
+        $this->message = $message;
     }
 
     public function broadcastOn()
@@ -37,5 +27,20 @@ class MessageSent implements ShouldBroadcast
     public function broadcastAs()
     {
         return 'message.sent';
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'id' => $this->message->id,
+            'content' => $this->message->content,
+            'room_id' => $this->message->room_id,
+            'created_at' => $this->message->created_at,
+            'edited_at' => $this->message->edited_at,
+            'user' => [
+                'id' => $this->message->user->id,
+                'name' => $this->message->user->name,
+            ],
+        ];
     }
 }

@@ -13,17 +13,11 @@ return [
             'app_id' => env('PUSHER_APP_ID'),
             'options' => [
                 'cluster' => env('PUSHER_APP_CLUSTER'),
-                'useTLS' => env('PUSHER_APP_SCHEME', 'https') === 'https',
-                'host' => env('PUSHER_HOST', null), // normalmente null se usar pusher oficial
-                'port' => env('PUSHER_PORT', null), // null para usar padrão 443/80
-                'scheme' => env('PUSHER_APP_SCHEME', 'https'),
+                'useTLS' => true,
                 'encrypted' => true,
             ],
-            'client_options' => [],
         ],
 
-        // outros drivers
     ],
 
 ];
-

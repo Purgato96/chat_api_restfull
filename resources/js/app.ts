@@ -1,3 +1,4 @@
+import './echo' // ✅ IMPORTANTE: carrega Echo antes de qualquer coisa
 import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/vue3';
@@ -7,6 +8,7 @@ import { createApp, h } from 'vue';
 import { ZiggyVue } from 'ziggy-js';
 import { initializeTheme } from './composables/useAppearance';
 import { configureEcho } from '@laravel/echo-vue';
+
 
 configureEcho({
     broadcaster: 'pusher',

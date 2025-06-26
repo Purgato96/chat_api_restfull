@@ -37,7 +37,7 @@ class RoomController extends Controller
             ->values();
 
         return Inertia::render('Chat/Room', [
-            'room' => $room->load('users'),
+            'room' => $room->load(['users', 'creator']), // Adiciona o criador aqui
             'messages' => $messages,
         ]);
     }
@@ -83,6 +83,7 @@ class RoomController extends Controller
 
         return redirect()->route('rooms.index');
     }
+
     public function addUser(Request $request, Room $room)
     {
         // Verifica se o usuário atual é o criador da sala
