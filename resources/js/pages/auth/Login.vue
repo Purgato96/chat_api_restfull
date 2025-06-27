@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import { onMounted } from 'vue'
+import axios from 'axios'
 
 defineProps<{
     status?: string;
@@ -25,6 +27,10 @@ const submit = () => {
         onFinish: () => form.reset('password'),
     });
 };
+onMounted(async () => {
+    await axios.get('/sanctum/csrf-cookie')
+    console.log('✅ CSRF cookie inicializado')
+})
 </script>
 
 <template>

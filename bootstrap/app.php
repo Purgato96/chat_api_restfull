@@ -17,8 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->web(append: [
-            // Remova isso:
-            // HandleAppearance::class,
+            HandleAppearance::class,
             HandleInertiaRequests::class,
             Illuminate\Session\Middleware\StartSession::class,
             Illuminate\View\Middleware\ShareErrorsFromSession::class,

@@ -6,25 +6,28 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// Página inicial
 Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('home');
 
+// Dashboard protegido
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-
+// Rotas protegidas por autenticação
 Route::middleware(array_filter([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ]))->group(function () {
+    // Dashboard dentro do grupo
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    // Chat Routes
+    // Rotas do chat
     Route::prefix('chat')->group(function () {
         Route::get('/', [RoomController::class, 'index'])->name('rooms.index');
         Route::post('/rooms', [RoomController::class, 'store'])->name('rooms.store');
@@ -46,5 +49,5 @@ require __DIR__.'/auth.php';
 
 use Illuminate\Support\Facades\Broadcast;
 
-// ✅ Middleware correto para autenticação via Laravel Sanctum
+// ✅ Esta é a rota de broadcasting padrão com sessão web
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
