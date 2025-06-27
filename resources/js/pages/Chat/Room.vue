@@ -185,14 +185,11 @@ const messagesContainer = ref(null)
 const showUserManager = ref(false)
 const connectionStatus = ref('disconnected')
 
-// Mensagens locais (incluindo as recebidas via broadcasting)
 const localMessages = ref([...props.messages])
 
-// Edição de mensagem
 const editingMessage = ref(null)
 const editMessageContent = ref('')
 
-// Verifica se o usuário atual pode gerenciar usuários (é o criador)
 const canManageUsers = computed(() => {
     return props.room.created_by === pageProps.auth.user.id
 })
@@ -208,6 +205,18 @@ const sendMessage = async () => {
         }, {
             preserveState: true,
             onSuccess: () => {
+                // Adiciona mensagem localmente
+                localMessages.value.push({
+                    id: Date.now(), // ID temporário
+                    content: newMessage.value,
+                    room_id: props.room.id,
+                    created_at: new Date().toISOString(),
+                    edited_at: null,
+                    user: {
+                        id: pageProps.auth.user.id,
+                        name: pageProps.auth.user.name
+                    }
+                })
                 newMessage.value = ''
                 scrollToBottom()
             }
@@ -304,9 +313,19 @@ const setupEcho = () => {
     console.log('🚀 Configurando Laravel Echo para a sala:', props.room.slug)
 
     echoChannel = window.Echo.private(`room.${props.room.slug}`)
-        .listen('message.sent', (message) => {
-            console.log('📨 Nova mensagem recebida via broadcasting:', message)
-            localMessages.value.push(message)
+        .listen('.message.sent', (event) => {
+            console.log('📨 Nova mensagem recebida via broadcasting:', event)
+
+            // Adiciona mensagem recebida ao chat
+            localMessages.value.push({
+                id: event.id,
+                content: event.content,
+                room_id: event.room_id,
+                created_at: event.created_at,
+                edited_at: event.edited_at,
+                user: event.user
+            })
+
             scrollToBottom()
         })
         .subscribed(() => {
@@ -348,3 +367,4 @@ onUnmounted(() => {
     cleanupEcho()
 })
 </script>
+
