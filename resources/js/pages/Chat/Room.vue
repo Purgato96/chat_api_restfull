@@ -185,6 +185,7 @@ const messagesContainer = ref(null)
 const showUserManager = ref(false)
 const connectionStatus = ref('disconnected')
 
+// As mensagens locais começam com as carregadas
 const localMessages = ref([...props.messages])
 
 const editingMessage = ref(null)
@@ -194,6 +195,7 @@ const canManageUsers = computed(() => {
     return props.room.created_by === pageProps.auth.user.id
 })
 
+// ENVIO DE MENSAGEM SEM DUPLICAR
 const sendMessage = async () => {
     if (!newMessage.value.trim()) return
 
@@ -205,18 +207,6 @@ const sendMessage = async () => {
         }, {
             preserveState: true,
             onSuccess: () => {
-                // Adiciona mensagem localmente
-                localMessages.value.push({
-                    id: Date.now(), // ID temporário
-                    content: newMessage.value,
-                    room_id: props.room.id,
-                    created_at: new Date().toISOString(),
-                    edited_at: null,
-                    user: {
-                        id: pageProps.auth.user.id,
-                        name: pageProps.auth.user.name
-                    }
-                })
                 newMessage.value = ''
                 scrollToBottom()
             }
@@ -367,4 +357,5 @@ onUnmounted(() => {
     cleanupEcho()
 })
 </script>
+
 
