@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Rotas públicas (sem autenticação)
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->name('api.')->group(function () {
 
     // Autenticação
     Route::post('/auth/login', [AuthController::class, 'login']);
@@ -35,7 +35,7 @@ Route::prefix('v1')->group(function () {
 });
 
 // Rotas protegidas (requer autenticação)
-Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:api'])->group(function () {
+Route::prefix('v1')->name('api.')->middleware(['auth:sanctum', 'throttle:api'])->group(function () {
 
     // Autenticação
     Route::post('/auth/logout', [AuthController::class, 'logout']);
