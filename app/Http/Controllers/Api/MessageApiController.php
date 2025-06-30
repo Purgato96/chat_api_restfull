@@ -106,14 +106,13 @@ class MessageApiController extends Controller
         ]);
 
         $message = Message::create([
-            'content' => $request->content,
+            'content' => $request->input('content'),
             'user_id' => $user->id,
             'room_id' => $room->id,
         ]);
 
         $message->load('user:id,name');
 
-        // Dispara o evento de broadcasting
         broadcast(new MessageSent($message))->toOthers();
 
         return response()->json([

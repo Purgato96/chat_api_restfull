@@ -14,6 +14,7 @@ class RoomController extends Controller
     {
         $rooms = auth()->user()->rooms()
             ->with(['creator', 'latestMessages'])
+            ->withCount('users')
             ->get();
 
         return Inertia::render('Chat/Index', [
