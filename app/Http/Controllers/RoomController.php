@@ -10,7 +10,38 @@ use Inertia\Response;
 
 class RoomController extends Controller
 {
-    public function index(): Response
+    public function index()
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            abort(403, 'Não autenticado');
+        }
+
+        // Procura sala com slug account-{account_id}
+        $room = \App\Models\Room::where('slug', 'account-' . $user->account_id)->first();
+
+        if (!$room) {
+            $room = \App\Models\Room::create([
+                'name' => 'Espaço #' . $user->account_id,
+                'slug' => 'account-' . $user->account_id,
+                'is_private' => true,
+                'created_by' => $user->id,
+            ]);
+
+            // Adiciona criador
+            $room->users()->attach($user->id, ['joined_at' => now()]);
+        }
+
+        // Garante que o usuário está na sala
+        if (!$room->users()->where('user_id', $user->id)->exists()) {
+            $room->users()->attach($user->id, ['joined_at' => now()]);
+        }
+
+        // Redireciona para a sala
+        return redirect()->route('rooms.show', $room->slug);
+    }
+    /*public function index(): Response
     {
         $rooms = auth()->user()->rooms()
             ->with(['creator', 'latestMessages'])
@@ -20,7 +51,7 @@ class RoomController extends Controller
         return Inertia::render('Chat/Index', [
             'rooms' => $rooms,
         ]);
-    }
+    }*/
 
     public function show(Room $room): Response
     {

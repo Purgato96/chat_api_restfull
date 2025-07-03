@@ -99,6 +99,3 @@ Route::fallback(function () {
         'documentation' => '/api/v1/status'
     ], 404);
 });
-Route::prefix('v1')->group(function () {
-    Route::post('/auth/chatrace-login', [\App\Http\Controllers\Api\AuthController::class, 'chatraceLogin']);
-});
