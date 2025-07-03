@@ -17,13 +17,7 @@ Route::get('dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Rotas protegidas por autenticação
-Route::middleware(array_filter([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-]))->group(function () {
-    // Dashboard dentro do grupo
-    Route::get('/dashboard', function () {
+Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
@@ -42,7 +36,6 @@ Route::middleware(array_filter([
         Route::put('/messages/{message}', [MessageController::class, 'update'])->name('messages.update');
         Route::delete('/messages/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
     });
-});
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
