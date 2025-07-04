@@ -21,7 +21,7 @@ class ChatraceAutoLogin
         if (!$email || !$accountId) {
             abort(403, 'Missing email or account_id');
         }
-        dump($email, $accountId);
+        //dump($email, $accountId);
 
         // Procura ou cria o usuário
         $user = User::firstOrCreate(
