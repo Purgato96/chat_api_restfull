@@ -16,7 +16,7 @@ class ChatraceAutoLogin
         $accountId = $request->query('account_id');
 
         if ($email === '{{Email}}' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            abort(400, 'O parâmetro de email não foi preenchido corretamente. O email recebido foi: ' . $email);
+            abort(400, 'O parâmetro de email não foi preenchido corretamente. O email recebido foi: ' . $email . ' e o account_id foi: ' . $accountId);
         }
         if (!$email || !$accountId) {
             abort(403, 'Missing email or account_id');
