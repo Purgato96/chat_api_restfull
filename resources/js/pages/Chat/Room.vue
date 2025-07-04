@@ -13,7 +13,8 @@
                   <span class="text-sm text-gray-500">
                     {{ room.users.length }} {{ room.users.length === 1 ? 'usuário' : 'usuários' }}
                   </span>
-                                    <span v-if="room.is_private" class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                                    <span v-if="room.is_private"
+                                          class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
                     Privada
                   </span>
                                     <span v-else class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
@@ -39,41 +40,54 @@
                                 <div
                                     v-for="message in localMessages"
                                     :key="message.id"
-                                    class="flex items-start space-x-3"
+                                    class="flex flex-col"
                                 >
-                                    <!-- Avatar do usuário -->
-                                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                                        {{ message.user.name.charAt(0).toUpperCase() }}
+                                    <div
+                                        :class="{
+      'self-end bg-blue-500 text-white': message.user.id === $page.props.auth.user.id,
+      'self-start bg-gray-200 text-gray-900': message.user.id !== $page.props.auth.user.id
+    }"
+                                        class="max-w-xs md:max-w-sm lg:max-w-md rounded-lg shadow px-4 py-2"
+                                    >
+                                        <div class="flex items-center space-x-2 mb-1">
+      <span class="text-xs font-semibold">
+        {{ message.user.name }}
+      </span>
+                                            <span class="text-[10px] text-gray-300"
+                                                  v-if="message.user.id === $page.props.auth.user.id">
+        (você)
+      </span>
+                                            <span class="text-[10px] text-gray-600">
+        {{ formatTime(message.created_at) }}
+      </span>
+                                            <span v-if="message.edited_at"
+                                                  class="text-[10px] text-gray-400">(editada)</span>
+                                        </div>
+                                        <p class="text-sm break-words">
+                                            {{ message.content }}
+                                        </p>
                                     </div>
 
-                                    <!-- Conteúdo da mensagem -->
-                                    <div class="flex-1">
-                                        <div class="flex items-center space-x-2">
-                                            <span class="font-medium text-gray-900">{{ message.user.name }}</span>
-                                            <span class="text-xs text-gray-500">
-                        {{ formatTime(message.created_at) }}
-                      </span>
-                                            <span v-if="message.edited_at" class="text-xs text-gray-400">(editada)</span>
-                                        </div>
-                                        <p class="text-gray-700 mt-1">{{ message.content }}</p>
-
-                                        <!-- Ações da mensagem (apenas para o autor) -->
-                                        <div v-if="message.user.id === $page.props.auth.user.id" class="flex space-x-2 mt-2">
-                                            <button
-                                                @click="editMessage(message)"
-                                                class="text-xs text-blue-600 hover:text-blue-800"
-                                            >
-                                                Editar
-                                            </button>
-                                            <button
-                                                @click="deleteMessage(message.id)"
-                                                class="text-xs text-red-600 hover:text-red-800"
-                                            >
-                                                Excluir
-                                            </button>
-                                        </div>
+                                    <!-- Ações de mensagem (somente para o autor) -->
+                                    <div
+                                        v-if="message.user.id === $page.props.auth.user.id"
+                                        class="flex self-end space-x-2 mt-1"
+                                    >
+                                        <button
+                                            @click="editMessage(message)"
+                                            class="text-xs text-blue-600 hover:underline"
+                                        >
+                                            Editar
+                                        </button>
+                                        <button
+                                            @click="deleteMessage(message.id)"
+                                            class="text-xs text-red-600 hover:underline"
+                                        >
+                                            Excluir
+                                        </button>
                                     </div>
                                 </div>
+
                             </div>
 
                             <!-- Formulário de envio de mensagem -->
@@ -142,10 +156,10 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
-import ChatLayout from '@/layouts/ChatLayout.vue'
-import RoomUserManager from '@/components/RoomUserManager.vue'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
+import { router, usePage } from '@inertiajs/vue3';
+import ChatLayout from '@/layouts/ChatLayout.vue';
+import RoomUserManager from '@/components/RoomUserManager.vue';
 
 const props = defineProps({
     room: {
@@ -156,30 +170,30 @@ const props = defineProps({
         type: Array,
         required: true
     }
-})
-const { props: pageProps } = usePage()
+});
+const { props: pageProps } = usePage();
 
-const newMessage = ref('')
-const isSending = ref(false)
-const messagesContainer = ref(null)
-const showUserManager = ref(false)
-const connectionStatus = ref('disconnected')
+const newMessage = ref('');
+const isSending = ref(false);
+const messagesContainer = ref(null);
+const showUserManager = ref(false);
+const connectionStatus = ref('disconnected');
 
 // As mensagens locais começam com as carregadas
-const localMessages = ref([...props.messages])
+const localMessages = ref([...props.messages]);
 
-const editingMessage = ref(null)
-const editMessageContent = ref('')
+const editingMessage = ref(null);
+const editMessageContent = ref('');
 
 const canManageUsers = computed(() => {
-    return props.room.created_by === pageProps.auth.user.id
-})
+    return props.room.created_by === pageProps.auth.user.id;
+});
 
 // ENVIO DE MENSAGEM SEM DUPLICAR
 const sendMessage = async () => {
-    if (!newMessage.value.trim()) return
+    if (!newMessage.value.trim()) return;
 
-    isSending.value = true
+    isSending.value = true;
 
     try {
         await router.post(route('messages.store', props.room.slug), {
@@ -187,31 +201,31 @@ const sendMessage = async () => {
         }, {
             preserveState: true,
             onSuccess: () => {
-                newMessage.value = ''
-                scrollToBottom()
+                newMessage.value = '';
+                scrollToBottom();
             }
-        })
+        });
     } catch (error) {
-        console.error('Erro ao enviar mensagem:', error)
+        console.error('Erro ao enviar mensagem:', error);
     } finally {
-        isSending.value = false
+        isSending.value = false;
     }
-}
+};
 
 const editMessage = (message) => {
-    editingMessage.value = message
-    editMessageContent.value = message.content
-}
+    editingMessage.value = message;
+    editMessageContent.value = message.content;
+};
 
 const cancelEdit = () => {
-    editingMessage.value = null
-    editMessageContent.value = ''
-}
+    editingMessage.value = null;
+    editMessageContent.value = '';
+};
 
 const updateMessage = async () => {
-    if (!editMessageContent.value.trim()) return
+    if (!editMessageContent.value.trim()) return;
 
-    isSending.value = true
+    isSending.value = true;
 
     try {
         await router.put(route('messages.update', editingMessage.value.slug), {
@@ -219,72 +233,72 @@ const updateMessage = async () => {
         }, {
             preserveState: true,
             onSuccess: () => {
-                cancelEdit()
+                cancelEdit();
             }
-        })
+        });
     } catch (error) {
-        console.error('Erro ao editar mensagem:', error)
+        console.error('Erro ao editar mensagem:', error);
     } finally {
-        isSending.value = false
+        isSending.value = false;
     }
-}
+};
 
 const deleteMessage = async (messageId) => {
-    if (!confirm('Tem certeza que deseja excluir esta mensagem?')) return
+    if (!confirm('Tem certeza que deseja excluir esta mensagem?')) return;
 
     try {
         await router.delete(route('messages.destroy', messageId), {
             preserveState: true,
             onSuccess: () => {
-                const index = localMessages.value.findIndex(msg => msg.id === messageId)
+                const index = localMessages.value.findIndex(msg => msg.id === messageId);
                 if (index !== -1) {
-                    localMessages.value.splice(index, 1)
+                    localMessages.value.splice(index, 1);
                 }
             }
-        })
+        });
     } catch (error) {
-        console.error('Erro ao excluir mensagem:', error)
+        console.error('Erro ao excluir mensagem:', error);
     }
-}
+};
 
 const leaveRoom = async () => {
-    if (!confirm('Tem certeza que deseja sair desta sala?')) return
+    if (!confirm('Tem certeza que deseja sair desta sala?')) return;
 
     try {
-        await router.delete(route('rooms.leave', props.room.slug))
+        await router.delete(route('rooms.leave', props.room.slug));
     } catch (error) {
-        console.error('Erro ao sair da sala:', error)
+        console.error('Erro ao sair da sala:', error);
     }
-}
+};
 
 const formatTime = (timestamp) => {
     return new Date(timestamp).toLocaleTimeString('pt-BR', {
         hour: '2-digit',
         minute: '2-digit'
-    })
-}
+    });
+};
 
 const scrollToBottom = () => {
     nextTick(() => {
         if (messagesContainer.value) {
-            messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+            messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
         }
-    })
-}
+    });
+};
 
-let echoChannel = null
+let echoChannel = null;
 
 const setupEcho = () => {
     if (!window.Echo) {
-        console.error('❌ Laravel Echo não está disponível')
-        return
+        console.error('❌ Laravel Echo não está disponível');
+        return;
     }
 
-    console.log('🚀 Configurando Laravel Echo para a sala:', props.room.slug)
+    console.log('🚀 Configurando Laravel Echo para a sala:', props.room.slug);
 
     echoChannel = window.Echo.private(`room.${props.room.slug}`)
         .listen('.message.sent', (event) => {
-            console.log('📨 Nova mensagem recebida via broadcasting:', event)
+            console.log('📨 Nova mensagem recebida via broadcasting:', event);
 
             // Adiciona mensagem recebida ao chat
             localMessages.value.push({
@@ -294,48 +308,48 @@ const setupEcho = () => {
                 created_at: event.created_at,
                 edited_at: event.edited_at,
                 user: event.user
-            })
+            });
 
-            scrollToBottom()
+            scrollToBottom();
         })
         .subscribed(() => {
-            console.log('✅ Inscrito no canal da sala com sucesso')
-            connectionStatus.value = 'connected'
+            console.log('✅ Inscrito no canal da sala com sucesso');
+            connectionStatus.value = 'connected';
         })
         .error((error) => {
-            console.error('❌ Erro no canal da sala:', error)
-            connectionStatus.value = 'disconnected'
-        })
+            console.error('❌ Erro no canal da sala:', error);
+            connectionStatus.value = 'disconnected';
+        });
 
     if (window.Echo.connector?.pusher?.connection) {
         window.Echo.connector.pusher.connection.bind('connected', () => {
-            console.log('✅ Pusher conectado')
-            connectionStatus.value = 'connected'
-        })
+            console.log('✅ Pusher conectado');
+            connectionStatus.value = 'connected';
+        });
 
         window.Echo.connector.pusher.connection.bind('disconnected', () => {
-            console.log('❌ Pusher desconectado')
-            connectionStatus.value = 'disconnected'
-        })
+            console.log('❌ Pusher desconectado');
+            connectionStatus.value = 'disconnected';
+        });
     }
-}
+};
 
 const cleanupEcho = () => {
     if (echoChannel) {
-        window.Echo.leave(`room.${props.room.slug}`)
-        echoChannel = null
-        console.log('🧹 Canal desconectado')
+        window.Echo.leave(`room.${props.room.slug}`);
+        echoChannel = null;
+        console.log('🧹 Canal desconectado');
     }
-}
+};
 
 onMounted(() => {
-    scrollToBottom()
-    setTimeout(setupEcho, 100)
-})
+    scrollToBottom();
+    setTimeout(setupEcho, 100);
+});
 
 onUnmounted(() => {
-    cleanupEcho()
-})
+    cleanupEcho();
+});
 </script>
 
 
