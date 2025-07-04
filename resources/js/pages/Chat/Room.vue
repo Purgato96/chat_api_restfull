@@ -1,5 +1,5 @@
 <template>
-    <AppLayout :title="`Sala: ${room.name}`">
+    <ChatLayout :title="`Sala: ${room.name}`">
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
@@ -158,13 +158,13 @@
                 </div>
             </div>
         </div>
-    </AppLayout>
+    </ChatLayout>
 </template>
 
 <script setup>
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
-import AppLayout from '@/layouts/AppLayout.vue'
+import ChatLayout from '@/layouts/ChatLayout.vue'
 import RoomUserManager from '@/components/RoomUserManager.vue'
 
 const props = defineProps({
