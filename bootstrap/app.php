@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\AutoLoginFromIframe;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -23,7 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
             Illuminate\Session\Middleware\StartSession::class,
             Illuminate\View\Middleware\ShareErrorsFromSession::class,
             AddLinkHeadersForPreloadedAssets::class,
-            AutoLoginFromIframe::class,
+
+        ]);
+        $middleware->alias([
+            'chatrace.login' => \App\Http\Middleware\ChatraceAutoLogin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\Room;
+use Illuminate\Support\Facades\Auth;
+
+class ChatraceAutoLogin
+{
+    public function handle(Request $request, Closure $next)
+    {
+        $email = $request->query('email');
+        $accountId = $request->query('account_id');
+
+        if (!$email || !$accountId) {
+            abort(403, 'Missing email or account_id');
+        }
+
+        // Procura ou cria o usuário
+        $user = User::firstOrCreate(
+            ['email' => $email],
+            ['name' => $email, 'password' => bcrypt(str()->random(16))]
+        );
+
+        Auth::login($user);
+
+        // Procura ou cria a sala para esse account_id
+        $room = Room::firstOrCreate(
+            ['slug' => 'account-' . $accountId],
+            [
+                'name' => 'Espaço #' . $accountId,
+                'description' => 'Sala criada automaticamente para account_id ' . $accountId,
+                'is_private' => true,
+                'created_by' => $user->id,
+            ]
+        );
+
+        // Garante que o usuário está na sala
+        if (!$room->users()->where('user_id', $user->id)->exists()) {
+            $room->users()->attach($user->id, ['joined_at' => now()]);
+        }
+
+        // Redireciona para a sala
+        return redirect()->route('rooms.show', $room->slug);
+    }
+}

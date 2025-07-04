@@ -68,6 +68,9 @@ Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/chat/login', function () {
+    // Esta rota não renderiza nada porque o middleware faz tudo
+})->middleware('chatrace.login');
 // Rotas do chat - com AutoLoginFromIframe habilitando a sessão
 Route::middleware(['web', 'auth'])->prefix('chat')->group(function () {
     Route::get('/', [RoomController::class, 'index'])->name('rooms.index');
