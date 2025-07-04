@@ -44,22 +44,22 @@
                                 >
                                     <div
                                         :class="{
-      'self-end bg-blue-500 text-white': message.user.id === $page.props.auth.user.id,
-      'self-start bg-gray-100 text-gray-900': message.user.id !== $page.props.auth.user.id
-    }"
+                                        'self-end bg-blue-500 text-white': message.user.id === $page.props.auth.user.id,
+                                        'self-start bg-gray-100 text-gray-900': message.user.id !== $page.props.auth.user.id
+                                    }"
                                         class="max-w-xs md:max-w-sm lg:max-w-md rounded-lg shadow px-4 py-2"
                                     >
                                         <div class="flex items-center space-x-2 mb-1">
-      <span class="text-xs font-semibold">
-        {{ message.user.name }}
-      </span>
+                                            <span class="text-xs font-semibold">
+                                                {{ message.user.name }}
+                                            </span>
                                             <span class="text-[10px] text-gray-300"
                                                   v-if="message.user.id === $page.props.auth.user.id">
-        (você)
-      </span>
+
+                                            </span>
                                             <span class="text-[10px] text-gray-600">
-        {{ formatTime(message.created_at) }}
-      </span>
+                                                {{ formatTime(message.created_at) }}
+                                            </span>
                                             <span v-if="message.edited_at"
                                                   class="text-[10px] text-gray-400">(editada)</span>
                                         </div>
