@@ -45,7 +45,7 @@
                                     <div
                                         :class="{
       'self-end bg-blue-500 text-white': message.user.id === $page.props.auth.user.id,
-      'self-start bg-gray-200 text-gray-900': message.user.id !== $page.props.auth.user.id
+      'self-start bg-gray-100 text-gray-900': message.user.id !== $page.props.auth.user.id
     }"
                                         class="max-w-xs md:max-w-sm lg:max-w-md rounded-lg shadow px-4 py-2"
                                     >
