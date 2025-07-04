@@ -69,7 +69,7 @@
                                     </div>
 
                                     <!-- Ações de mensagem (somente para o autor) -->
-                                    <div
+<!--                                    <div
                                         v-if="message.user.id === $page.props.auth.user.id"
                                         class="flex self-end space-x-2 mt-1"
                                     >
@@ -85,7 +85,7 @@
                                         >
                                             Excluir
                                         </button>
-                                    </div>
+                                    </div>-->
                                 </div>
 
                             </div>
