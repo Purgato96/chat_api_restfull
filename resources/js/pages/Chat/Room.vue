@@ -28,18 +28,6 @@
                   </span>
                                 </div>
                             </div>
-
-                            <!-- Botões de ação -->
-                            <div class="flex space-x-2">
-                                <!-- Botão para gerenciar usuários (apenas para criador) -->
-                                <button
-                                    v-if="canManageUsers"
-                                    @click="showUserManager = !showUserManager"
-                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
-                                >
-                                    {{ showUserManager ? 'Ocultar' : 'Gerenciar' }} Usuários
-                                </button>
-                            </div>
                         </div>
                     </div>
 
