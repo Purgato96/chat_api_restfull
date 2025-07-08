@@ -58,7 +58,7 @@
 
                                             </span>
                                             <span class="text-[10px] text-black font-bold">
-                                               {{ formatTime(message.created_at) }}
+                                                {{ formatDate(message.created_at) }} - {{ formatTime(message.created_at) }}
                                             </span>
                                             <span v-if="message.edited_at"
                                                   class="text-[10px] text-gray-400">(editada)</span>
@@ -273,11 +273,15 @@ const leaveRoom = async () => {
 
 const formatTime = (timestamp) => {
     return new Date(timestamp).toLocaleTimeString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
+    });
+};
+const formatDate = (timestamp) => {
+    return new Date(timestamp).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
     });
 };
 
