@@ -57,7 +57,7 @@
                                                   v-if="message.user.id === $page.props.auth.user.id">
 
                                             </span>
-                                            <span class="text-[10px] text-gray-600">
+                                            <span class="text-[10px] text-black font-bold">
                                                {{ formatTime(message.created_at) }}
                                             </span>
                                             <span v-if="message.edited_at"
