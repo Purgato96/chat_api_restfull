@@ -58,6 +58,9 @@ Route::prefix('v1')->name('api.')->middleware(['auth:sanctum', 'throttle:api'])-
     // Rotas diretas para mensagens (sem precisar da sala)
     Route::put('/messages/{message}', [MessageApiController::class, 'update']);
     Route::delete('/messages/{message}', [MessageApiController::class, 'destroy']);
+
+    Route::get('rooms/private/all', [RoomApiController::class, 'myPrivateRooms']);
+
 });
 
 // Rota para autenticação do broadcasting (WebSocket)

@@ -1,13 +1,18 @@
 <template>
-    <div class="min-h-screen bg-gray-100 text-gray-900 flex flex-col">
-        <main class="flex-1">
+    <div class="flex h-screen bg-gray-50">
+        <!-- Sidebar de Mensagens Privadas -->
+        <PrivateRoomsSidebar />
+
+        <!-- Conteúdo principal -->
+        <div class="flex-1 overflow-y-auto">
             <slot />
-        </main>
+        </div>
     </div>
 </template>
 
 <script setup>
 import { Head } from '@inertiajs/vue3'
+import PrivateRoomsSidebar from '@/components/PrivateRoomsSidebar.vue'
 
 const props = defineProps({
     title: {

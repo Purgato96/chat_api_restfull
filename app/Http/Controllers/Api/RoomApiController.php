@@ -216,4 +216,25 @@ class RoomApiController extends Controller
             ]
         ]);
     }
+    /**
+     * Lista todas as salas privadas do usuário autenticado
+     */
+    public function myPrivateRooms(Request $request)
+    {
+        $user = $request->user();
+
+        $rooms = Room::where('is_private', true)
+            ->whereHas('users', function($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->with(['users' => function($q) use ($user) {
+                $q->where('user_id', '!=', $user->id)
+                    ->select('users.id', 'users.name', 'users.email');
+            }])
+            ->get();
+
+        return response()->json([
+            'data' => $rooms
+        ]);
+    }
 }
