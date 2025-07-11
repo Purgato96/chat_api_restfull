@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Provider base da aplicação onde são
+ * registrados serviços globais e rotas
+ * de broadcast do Laravel.
+ */
+
 namespace App\Providers;
 
 use Illuminate\Support\Facades\Broadcast;

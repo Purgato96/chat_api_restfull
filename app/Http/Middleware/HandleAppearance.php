@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Compartilha a preferência de tema (claro/escuro)
+ * com todas as views a partir de cookie salvo
+ * pelo frontend.
+ */
+
 namespace App\Http\Middleware;
 
 use Closure;

@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Define onde as rotas web e API são
+ * carregadas e aplica limitações de
+ * rate limiting para requisições.
+ */
+
 namespace App\Providers;
 
 use Illuminate\Support\Facades\Route;

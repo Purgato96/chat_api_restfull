@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Envia o link de redefinição de senha
+ * para o e-mail informado pelo usuário.
+ */
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;

@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Controlador da API responsável pelas
+ * operações de mensagens nas salas de chat.
+ * Inclui listagem, envio e busca de mensagens.
+ */
+
 namespace App\Http\Controllers\Api;
 
 use App\Events\MessageSent;

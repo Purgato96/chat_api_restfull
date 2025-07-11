@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Middleware padrão do Inertia que
+ * compartilha dados comuns entre as
+ * requisições SPA e as views Blade.
+ */
+
 namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Inspiring;

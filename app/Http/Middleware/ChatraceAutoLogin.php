@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Middleware utilizado para acesso ao chat
+ * via parâmetros de email e account_id, criando
+ * usuário e sala automaticamente.
+ */
+
 namespace App\Http\Middleware;
 
 use Closure;

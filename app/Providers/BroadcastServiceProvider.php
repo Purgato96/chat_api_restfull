@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Configura os canais e a autenticação
+ * utilizados pelo broadcasting de eventos
+ * em tempo real via Pusher.
+ */
+
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;

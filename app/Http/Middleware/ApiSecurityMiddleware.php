@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Middleware de segurança para chamadas à API.
+ * Valida origens permitidas e adiciona
+ * cabeçalhos de proteção às respostas.
+ */
+
 namespace App\Http\Middleware;
 
 use Closure;

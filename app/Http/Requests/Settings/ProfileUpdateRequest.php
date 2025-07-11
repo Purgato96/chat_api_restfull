@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Validação dos dados enviados ao atualizar
+ * o perfil do usuário no painel.
+ */
+
 namespace App\Http\Requests\Settings;
 
 use App\Models\User;

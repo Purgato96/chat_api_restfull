@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Manipula a confirmação do e-mail do usuário
+ * via link de verificação enviado pelo Laravel.
+ */
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Gerencia a edição do perfil do usuário
+ * como nome e foto, utilizando Inertia.
+ */
+
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;

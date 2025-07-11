@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Controlador responsável pelas telas
+ * do chat utilizando Inertia. Gere salas
+ * e renderiza mensagens para usuários logados.
+ */
+
 namespace App\Http\Controllers;
 
 use App\Models\Room;

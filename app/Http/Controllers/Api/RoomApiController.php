@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Controller REST que gerencia as salas via API.
+ * Possui endpoints para listar, criar e gerenciar
+ * salas e membros utilizando autenticação Sanctum.
+ */
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;

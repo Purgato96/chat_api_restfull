@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Controlador web de mensagens utilizado
+ * nas rotas Inertia. Emite eventos de
+ * broadcast ao criar ou atualizar mensagens.
+ */
+
 namespace App\Http\Controllers;
 
 use App\Models\Room;

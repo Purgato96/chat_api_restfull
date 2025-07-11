@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Versão do evento para consumo de clientes
+ * externos via API, transmitindo apenas
+ * dados essenciais da mensagem.
+ */
+
 namespace App\Events;
 
 use App\Models\Message;

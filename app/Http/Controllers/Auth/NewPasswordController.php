@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Finaliza o fluxo de redefinição de senha,
+ * permitindo que o usuário defina uma nova
+ * senha a partir do token recebido por e-mail.
+ */
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;

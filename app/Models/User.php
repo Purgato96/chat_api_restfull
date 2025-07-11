@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Modelo de usuário estendido com suporte
+ * a tokens de API e relacionamentos do chat.
+ */
+
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;

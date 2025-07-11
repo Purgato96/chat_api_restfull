@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dispara o reenvio do e-mail de verificação
+ * para usuários que ainda não confirmaram
+ * o endereço de e-mail.
+ */
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;

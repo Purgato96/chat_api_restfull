@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Modelo das salas de chat. Controla os
+ * relacionamentos com usuários e mensagens.
+ */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;

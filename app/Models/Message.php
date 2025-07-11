@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Representa uma mensagem enviada dentro
+ * de uma sala de chat.
+ */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;

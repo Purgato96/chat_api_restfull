@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Policy básica para futuras regras de
+ * autorização relacionadas às salas.
+ */
+
 namespace App\Policies;
 
 use App\Models\User;

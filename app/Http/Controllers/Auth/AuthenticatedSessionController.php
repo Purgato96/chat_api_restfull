@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Processa login e logout de usuários
+ * para as rotas tradicionais do sistema.
+ */
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;

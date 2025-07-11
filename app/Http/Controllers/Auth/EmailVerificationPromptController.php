@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Apresenta a tela de verificação de e-mail
+ * para usuários que ainda não confirmaram
+ * sua conta.
+ */
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;

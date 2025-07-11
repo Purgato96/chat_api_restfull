@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Provider responsável pela configuração
+ * do Laravel Horizon, ferramenta de
+ * monitoramento de filas.
+ */
+
 namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;

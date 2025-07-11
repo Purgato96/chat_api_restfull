@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Controla o registro de novos usuários
+ * através das telas padrão do Jetstream.
+ */
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;

@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Fornece autenticação e listagem de
+ * canais privados para conexões WebSocket
+ * externas usando Pusher.
+ */
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;

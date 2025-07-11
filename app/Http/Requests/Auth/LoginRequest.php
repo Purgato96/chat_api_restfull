@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Form request utilizado no login web
+ * contendo validação e controle de
+ * tentativa para evitar brute force.
+ */
+
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Auth\Events\Lockout;

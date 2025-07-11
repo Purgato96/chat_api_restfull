@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Evento broadcast quando uma mensagem é
+ * enviada em uma sala. Utilizado para
+ * atualizar clientes conectados em tempo real.
+ */
+
 namespace App\Events;
 
 use App\Models\Message;

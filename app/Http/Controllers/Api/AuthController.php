@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Endpoints de autenticação da API.
+ * Responsável por login, registro e
+ * gerenciamento de tokens pessoais.
+ */
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Permite ao usuário alterar sua senha
+ * dentro da área de configurações pessoais.
+ */
+
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
