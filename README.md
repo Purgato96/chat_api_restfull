@@ -1,3 +1,11 @@
+[![License](https://img.shields.io/github/license/Purgato96/chat_api_restfull)](https://github.com/Purgato96/chat_api_restfull/blob/main/LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/Purgato96/chat_api_restfull)](https://github.com/Purgato96/chat_api_restfull/commits/main)
+[![Stars](https://img.shields.io/github/stars/Purgato96/chat_api_restfull)](https://github.com/Purgato96/chat_api_restfull/stargazers)
+[![Issues](https://img.shields.io/github/issues/Purgato96/chat_api_restfull)](https://github.com/Purgato96/chat_api_restfull/issues)
+![Laravel](https://img.shields.io/badge/Laravel-12-red)
+![PHP](https://img.shields.io/badge/PHP-8.4-blue)
+
+
 # Chat API RESTful
 
 [🇺🇸 English](#-english) | [🇧🇷 Português](#-português)
