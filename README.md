@@ -5,7 +5,6 @@
 ![Laravel](https://img.shields.io/badge/Laravel-12-red)
 ![PHP](https://img.shields.io/badge/PHP-8.4-blue)
 
-
 # Chat API RESTful
 
 [🇺🇸 English](#-english) | [🇧🇷 Português](#-português)
@@ -23,11 +22,11 @@ Provides a REST API secured with Laravel Sanctum and WebSocket integration using
 - Sending and editing messages with real-time broadcast
 - REST endpoints for rooms and messages
 
-### Installation 
-   ```bash 
-      composer install
-      npm install
-   ```
+### Installation
+```bash 
+  composer install
+  npm install
+```
 
 ### Configuration
 1. Copy `.env.example` to `.env`:
@@ -86,6 +85,17 @@ Authorization: Bearer <token>
   "content": "Hello"
 }
 ```
+
+### 🌐 Live API Endpoints
+
+Production environment:
+
+- **Register:** [`POST /api/v1/register`](https://basedopurga.com.br/api/v1/register)
+- **Login:** [`POST /api/v1/login`](https://basedopurga.com.br/api/v1/login)
+
+**API Base URL:** [https://basedopurga.com.br/api/v1](https://basedopurga.com.br/api/v1)
+
+> ℹ️ Additional endpoints for rooms and messages are also available in the production API.
 
 ### Tech Stack
 - PHP 8 / Laravel
@@ -176,6 +186,17 @@ Authorization: Bearer <token>
   "content": "Olá"
 }
 ```
+
+### 🌐 Endpoints da API em Produção
+
+Ambiente de produção:
+
+- **Registrar:** [`POST /api/v1/register`](https://basedopurga.com.br/api/v1/register)
+- **Login:** [`POST /api/v1/login`](https://basedopurga.com.br/api/v1/login)
+
+**URL base da API:** [https://basedopurga.com.br/api/v1](https://basedopurga.com.br/api/v1)
+
+> ℹ️ Outros endpoints para salas e mensagens também estão disponíveis na API em produção.
 
 ### Tecnologias
 - PHP 8 / Laravel
