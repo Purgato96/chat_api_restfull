@@ -179,7 +179,6 @@ const messagesContainer = ref(null);
 const showUserManager = ref(false);
 const connectionStatus = ref('disconnected');
 
-// As mensagens locais começam com as carregadas
 const localMessages = ref([...props.messages]);
 
 const editingMessage = ref(null);
@@ -189,7 +188,6 @@ const canManageUsers = computed(() => {
     return props.room.created_by === pageProps.auth.user.id;
 });
 
-// ENVIO DE MENSAGEM SEM DUPLICAR
 const sendMessage = async () => {
     if (!newMessage.value.trim()) return;
 
@@ -211,11 +209,6 @@ const sendMessage = async () => {
         isSending.value = false;
     }
 };
-
-/*const editMessage = (message) => {
-    editingMessage.value = message;
-    editMessageContent.value = message.content;
-};*/
 
 const cancelEdit = () => {
     editingMessage.value = null;
@@ -277,6 +270,7 @@ const formatTime = (timestamp) => {
         minute: '2-digit'
     });
 };
+
 const formatDate = (timestamp) => {
     return new Date(timestamp).toLocaleDateString('pt-BR', {
         day: '2-digit',
@@ -307,7 +301,6 @@ const setupEcho = () => {
         .listen('.message.sent', (event) => {
             console.log('📨 Nova mensagem recebida via broadcasting:', event);
 
-            // Adiciona mensagem recebida ao chat
             localMessages.value.push({
                 id: event.id,
                 content: event.content,

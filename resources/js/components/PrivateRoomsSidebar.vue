@@ -1,11 +1,19 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { router } from '@inertiajs/vue3';
-import axios from '@/axios'
+import { router, usePage } from '@inertiajs/vue3';
+import axios from '@/axios';
 
 const privateRooms = ref([]);
 const loading = ref(true);
 const sidebarOpen = ref(true);
+
+// 🔹 Pega slug atual com fallback seguro
+const page = usePage();
+const currentSlug = page.props.room && page.props.room.slug
+    ? page.props.room.slug
+    : '';
+
+const activeRoomSlug = ref(currentSlug);
 
 const fetchPrivateRooms = async () => {
     try {
@@ -14,19 +22,42 @@ const fetchPrivateRooms = async () => {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }
-        })
-        privateRooms.value = response.data.data
+        });
+        privateRooms.value = response.data.data;
+
+        // Atualiza activeRoomSlug se não tiver slug
+        if (!activeRoomSlug.value && privateRooms.value.length > 0) {
+            activeRoomSlug.value = privateRooms.value[0].slug || `room-${privateRooms.value[0].id}`;
+        }
     } catch (error) {
-        console.error('Erro ao carregar salas privadas:', error.response?.data || error)
+        console.error('Erro ao carregar salas privadas:', error.response?.data || error);
+    } finally {
+        loading.value = false;
     }
-}
+};
 
 const toggleSidebar = () => {
     sidebarOpen.value = !sidebarOpen.value;
 };
 
 const openRoom = (room) => {
-    router.visit(`/chat/rooms/${room.slug}`);
+    if (!room.slug || room.slug.trim() === '') {
+        console.warn('Slug vazio detectado. Usando fallback.');
+        room.slug = `room-${room.id}`;
+    }
+
+    if (room.slug === activeRoomSlug.value) {
+        console.log('Já estamos nesta sala. Ignorando.');
+        return;
+    }
+
+    activeRoomSlug.value = room.slug;
+
+    router.visit(`/chat/rooms/${room.slug}`, {
+        preserveScroll: true,
+        preserveState: false,
+        onStart: () => console.log(`Mudando para sala: ${room.slug}`)
+    });
 };
 
 onMounted(() => {
@@ -56,10 +87,13 @@ onMounted(() => {
                     v-for="room in privateRooms"
                     :key="room.id"
                     @click="openRoom(room)"
-                    class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2"
+                    :class="[
+                        'flex items-center space-x-2 cursor-pointer p-2 rounded text-black',
+                        room.slug === activeRoomSlug ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-gray-100'
+                    ]"
                 >
                     <span class="text-gray-600">🔒</span>
-                    <span class="text-sm font-medium text-gray-700">{{ room.name }}</span>
+                    <span class="text-sm">{{ room.name }}</span>
                 </li>
                 <li v-if="privateRooms.length === 0" class="text-sm text-gray-500 p-2">
                     Nenhuma conversa privada.
@@ -74,7 +108,10 @@ onMounted(() => {
                     v-for="room in privateRooms"
                     :key="room.id"
                     @click="openRoom(room)"
-                    class="flex items-center justify-center cursor-pointer hover:bg-gray-100 p-2"
+                    :class="[
+                        'flex items-center justify-center cursor-pointer p-2 rounded',
+                        room.slug === activeRoomSlug ? 'bg-blue-100' : 'hover:bg-gray-100'
+                    ]"
                     title="Abrir conversa"
                 >
                     <span class="text-gray-600">🔒</span>
