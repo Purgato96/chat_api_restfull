@@ -53,6 +53,7 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::routes(['middleware' => ['auth:sanctum']]);*/
 
 
+use App\Http\Controllers\Api\RoomApiController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\RoomController;
 use Illuminate\Support\Facades\Route;
@@ -86,6 +87,11 @@ Route::middleware(['web', 'auth'])->prefix('chat')->group(function () {
     Route::put('/messages/{message}', [MessageController::class, 'update'])->name('messages.update');
     Route::delete('/messages/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
 });
+
+Route::prefix('api/v1')->middleware(['auth'])->group(function () {
+    Route::get('/rooms/private/all', [RoomApiController::class, 'myPrivateRooms']);
+});
+
 
 // Outras rotas do sistema
 require __DIR__ . '/settings.php';

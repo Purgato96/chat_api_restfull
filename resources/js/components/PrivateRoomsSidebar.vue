@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { router } from '@inertiajs/vue3';
+import axios from '@/axios'
 
 const privateRooms = ref([]);
 const loading = ref(true);
@@ -8,14 +9,17 @@ const sidebarOpen = ref(true);
 
 const fetchPrivateRooms = async () => {
     try {
-        const response = await axios.get('/api/v1/rooms/private/all');
-        privateRooms.value = response.data.data;
+        const response = await axios.get('/api/v1/rooms/private/all', {
+            withCredentials: true,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        privateRooms.value = response.data.data
     } catch (error) {
-        console.error('Erro ao carregar salas privadas:', error);
-    } finally {
-        loading.value = false;
+        console.error('Erro ao carregar salas privadas:', error.response?.data || error)
     }
-};
+}
 
 const toggleSidebar = () => {
     sidebarOpen.value = !sidebarOpen.value;

@@ -102,3 +102,9 @@ Route::fallback(function () {
         'documentation' => '/api/v1/status'
     ], 404);
 });
+Route::get('/v1/test', function (\Illuminate\Http\Request $request) {
+    return response()->json([
+        'auth_guard' => config('auth.defaults.guard'),
+        'user' => $request->user(),
+    ]);
+});
