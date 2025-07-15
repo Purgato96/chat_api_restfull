@@ -350,6 +350,18 @@ onMounted(() => {
 onUnmounted(() => {
     cleanupEcho();
 });
+
+import { watch } from 'vue';
+
+watch(
+    () => props.messages,
+    (newMessages) => {
+        console.log('📥 props.messages mudou, atualizando localMessages.');
+        localMessages.value = [...newMessages];
+        scrollToBottom();
+    },
+    { immediate: true }
+);
 </script>
 
 
