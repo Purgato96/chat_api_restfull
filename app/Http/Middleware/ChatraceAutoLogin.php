@@ -18,7 +18,7 @@ class ChatraceAutoLogin
 {
     public function handle(Request $request, Closure $next)
     {
-        $email = $request->query('user_email');
+        $email = $request->query('email');
         $accountId = $request->query('account_id');
 
         if ($email === '{{Email}}' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
