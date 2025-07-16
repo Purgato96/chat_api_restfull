@@ -75,6 +75,7 @@ Route::get('/chat/login', function () {
 // Rotas do chat - com AutoLoginFromIframe habilitando a sessão
 Route::middleware(['web', 'auth'])->prefix('chat')->group(function () {
     Route::get('/', [RoomController::class, 'index'])->name('rooms.index');
+    Route::get('/list', [RoomController::class, 'list'])->name('rooms.list');
     Route::post('/rooms', [RoomController::class, 'store'])->name('rooms.store');
     Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('rooms.show');
     Route::post('/rooms/{room}/join', [RoomController::class, 'join'])->name('rooms.join');

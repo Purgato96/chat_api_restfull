@@ -228,4 +228,15 @@ class RoomController extends Controller
         ]);
     }
 
+    public function list(): Response
+    {
+        $rooms = auth()->user()->rooms()
+            ->with(['creator', 'latestMessages'])
+            ->withCount('users')
+            ->get();
+
+        return Inertia::render('Chat/Index', [
+            'rooms' => $rooms,
+        ]);
+    }
 }
