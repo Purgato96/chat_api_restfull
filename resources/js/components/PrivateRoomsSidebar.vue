@@ -54,7 +54,7 @@ const openRoom = (room) => {
     activeRoomSlug.value = room.slug;
 
     router.visit(`/chat/rooms/${room.slug}`, {
-        preserveScroll: true,
+        preserveScroll: false,
         preserveState: false,
         onStart: () => console.log(`Mudando para sala: ${room.slug}`)
     });
