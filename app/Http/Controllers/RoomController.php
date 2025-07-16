@@ -24,27 +24,28 @@ class RoomController extends Controller
             abort(403, 'Não autenticado');
         }
 
-        // Procura sala com slug account-{account_id}
-        $room = \App\Models\Room::where('slug', 'account-' . $user->account_id)->first();
+        // Usa o account_id ou fallback pro ID do usuário
+        $accountId = $user->account_id ?: $user->id;
 
-        if (!$room) {
-            $room = \App\Models\Room::create([
-                'name' => 'Espaço #' . $user->account_id,
-                'slug' => 'account-' . $user->account_id,
+        $slug = 'account-' . $accountId;
+
+        // Cria apenas se não existir, de forma segura e atômica
+        $room = \App\Models\Room::firstOrCreate(
+            ['slug' => $slug],
+            [
+                'name' => 'Espaço #' . $accountId,
+                'description' => 'Sala criada automaticamente para account_id ' . $accountId,
                 'is_private' => true,
                 'created_by' => $user->id,
-            ]);
-
-            // Adiciona criador
-            $room->users()->attach($user->id, ['joined_at' => now()]);
-        }
+            ]
+        );
 
         // Garante que o usuário está na sala
         if (!$room->users()->where('user_id', $user->id)->exists()) {
             $room->users()->attach($user->id, ['joined_at' => now()]);
         }
 
-        // Redireciona para a sala
+        // Redireciona pra sala
         return redirect()->route('rooms.show', $room->slug);
     }
     /*public function index(): Response
