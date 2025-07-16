@@ -362,6 +362,15 @@ watch(
     },
     { immediate: true }
 );
+import { watchEffect } from 'vue';
+
+const page = usePage();
+
+watchEffect(() => {
+    console.log('🔄 Atualizando localMessages por mudança de URL ou props.messages.');
+    localMessages.value = [...props.messages];
+    scrollToBottom();
+});
 </script>
 
 
