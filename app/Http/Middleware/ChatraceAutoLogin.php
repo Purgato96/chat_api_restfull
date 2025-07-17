@@ -29,19 +29,18 @@ class ChatraceAutoLogin
             abort(403, 'Missing email or account_id');
         }
 
-        // Procura ou cria o usuário
+        // Limpa tudo ANTES de logar
+        session()->flush();
+        session()->regenerate();
+
+        // Cria ou busca o user e loga
         $user = User::firstOrCreate(
             ['email' => $email],
             ['name' => $email, 'password' => bcrypt(str()->random(16))]
         );
-
         Auth::login($user);
 
-        // Limpa sessão antiga e força nova
-        session()->flush();
-        session()->regenerate();
-
-        // Procura ou cria a sala
+        // Cria ou busca a sala
         $room = Room::firstOrCreate(
             ['slug' => 'account-' . $accountId],
             [
@@ -52,7 +51,7 @@ class ChatraceAutoLogin
             ]
         );
 
-        // Garante que o usuário está na sala
+        // Garante que o user está vinculado
         if (!$room->users()->where('user_id', $user->id)->exists()) {
             $room->users()->attach($user->id, ['joined_at' => now()]);
         }
