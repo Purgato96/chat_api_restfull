@@ -156,27 +156,24 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onMounted, onUnmounted, watch, watchEffect } from 'vue';
+import { ref, computed, nextTick, onMounted, onUnmounted, watchEffect, watch } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import ChatLayout from '@/layouts/ChatLayout.vue';
 import RoomUserManager from '@/components/RoomUserManager.vue';
 
 const props = defineProps({
-    room: { type: Object, required: true },
-    messages: { type: Array, required: true }
+    room: Object,
+    messages: Array
 });
 
 const { props: pageProps } = usePage();
-const page = usePage();
 
 const newMessage = ref('');
 const isSending = ref(false);
 const messagesContainer = ref(null);
 const showUserManager = ref(false);
 const connectionStatus = ref('disconnected');
-
 const localMessages = ref([]);
-
 const editingMessage = ref(null);
 const editMessageContent = ref('');
 
@@ -186,7 +183,6 @@ const canManageUsers = computed(() => {
 
 const sendMessage = async () => {
     if (!newMessage.value.trim()) return;
-
     isSending.value = true;
 
     try {
@@ -213,7 +209,6 @@ const cancelEdit = () => {
 
 const updateMessage = async () => {
     if (!editMessageContent.value.trim()) return;
-
     isSending.value = true;
 
     try {
@@ -240,9 +235,7 @@ const deleteMessage = async (messageId) => {
             preserveState: true,
             onSuccess: () => {
                 const index = localMessages.value.findIndex(msg => msg.id === messageId);
-                if (index !== -1) {
-                    localMessages.value.splice(index, 1);
-                }
+                if (index !== -1) localMessages.value.splice(index, 1);
             }
         });
     } catch (error) {
@@ -261,18 +254,11 @@ const leaveRoom = async () => {
 };
 
 const formatTime = (timestamp) => {
-    return new Date(timestamp).toLocaleTimeString('pt-BR', {
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    return new Date(timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 };
 
 const formatDate = (timestamp) => {
-    return new Date(timestamp).toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
+    return new Date(timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
 const scrollToBottom = () => {
@@ -283,7 +269,16 @@ const scrollToBottom = () => {
     });
 };
 
+// WebSocket
 let echoChannel = null;
+
+const cleanupEcho = () => {
+    if (echoChannel) {
+        window.Echo.leave(`room.${props.room.slug}`);
+        echoChannel = null;
+        console.log('🧹 Canal desconectado');
+    }
+};
 
 const setupEcho = () => {
     if (!window.Echo) {
@@ -299,24 +294,15 @@ const setupEcho = () => {
 
             const alreadyExists = localMessages.value.some(msg => msg.id === event.id);
             if (!alreadyExists) {
-                localMessages.value.push({
-                    id: event.id,
-                    content: event.content,
-                    room_id: event.room_id,
-                    created_at: event.created_at,
-                    edited_at: event.edited_at,
-                    user: event.user
-                });
+                localMessages.value.push(event);
                 scrollToBottom();
-            } else {
-                console.log(`⚠️ Mensagem ID ${event.id} já existe, ignorando duplicata.`);
             }
         })
         .subscribed(() => {
             console.log('✅ Inscrito no canal da sala com sucesso');
             connectionStatus.value = 'connected';
         })
-        .error((error) => {
+        .error(error => {
             console.error('❌ Erro no canal da sala:', error);
             connectionStatus.value = 'disconnected';
         });
@@ -334,49 +320,30 @@ const setupEcho = () => {
     }
 };
 
-const cleanupEcho = () => {
-    if (echoChannel) {
-        window.Echo.leave(`room.${props.room.slug}`);
-        echoChannel = null;
-        console.log('🧹 Canal desconectado');
-    }
-};
-
 onMounted(() => {
-    cleanupEcho();
     scrollToBottom();
-    setTimeout(setupEcho, 100);
+    cleanupEcho();
+    setupEcho();
 });
 
 onUnmounted(() => {
     cleanupEcho();
 });
 
-// Atualiza localMessages quando props.messages muda
+// WATCHERS
+watch(() => props.room.slug, (newSlug) => {
+    console.log('🔄 Sala mudou:', newSlug);
+    localMessages.value = [...props.messages];
+    scrollToBottom();
+}, { immediate: true });
+
 watchEffect(() => {
     if (props.messages?.length) {
-        localMessages.value = props.messages.map(m => ({
-            ...m,
-            fromCache: false
-        }));
-        console.log('🔄 Atualizando localMessages por props.messages:', localMessages.value);
+        localMessages.value = props.messages.map(m => ({ ...m, fromCache: false }));
+        console.log('🔄 Atualizando mensagens locais:', localMessages.value);
         scrollToBottom();
     }
 });
-
-// Reseta mensagens quando troca de sala
-watch(
-    () => props.room.slug,
-    (newSlug) => {
-        console.log('🔁 Mudou de sala para:', newSlug);
-        localMessages.value = [];
-        nextTick(() => {
-            localMessages.value = [...props.messages];
-            scrollToBottom();
-        });
-    },
-    { immediate: true }
-);
 </script>
 
 
