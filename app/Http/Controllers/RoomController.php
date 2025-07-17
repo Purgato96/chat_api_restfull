@@ -74,7 +74,7 @@ class RoomController extends Controller
             ->get()
             ->reverse()
             ->values();
-
+        \Log::info('Mensagens carregadas:', $messages->toArray());
         return Inertia::render('Chat/Room', [
             'room' => $room->load(['users', 'creator']), // Adiciona o criador aqui
             'messages' => $messages,
