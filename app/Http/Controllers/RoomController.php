@@ -86,12 +86,14 @@ class RoomController extends Controller
             'room_id' => $m->room_id,
         ])->toArray());
 
-        return Inertia::render('Chat/Room', [
-            'room' => $room,
-            'messages' => $messages,
-        ])->withViewData([
-            'no-cache' => true
-        ])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        return response(
+            Inertia::render('Chat/Room', [
+                'room' => $room,
+                'messages' => $messages,
+            ])->withViewData([
+                'no-cache' => true
+            ])
+        )->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     }
 
 
