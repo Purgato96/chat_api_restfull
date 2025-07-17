@@ -62,27 +62,27 @@ class RoomController extends Controller
 
     public function show(Room $room): Response
     {
+        // Verifica se o usuário tem acesso à sala
         if (!$room->users()->where('user_id', auth()->id())->exists()) {
             abort(403, 'Você não tem acesso a esta sala.');
         }
 
-        $messages = $room->messages()
+        // GARANTE que só pega mensagens da sala correta
+        $messages = \App\Models\Message::query()
+            ->where('room_id', $room->id)
             ->with('user')
-            ->latest()
+            ->orderByDesc('created_at')
             ->limit(50)
             ->get()
             ->reverse()
             ->values();
 
-        \Log::info('🧹 MENSAGENS DO BACKEND:');
-        foreach ($messages as $msg) {
-            \Log::info("-> ID: {$msg->id}, content: {$msg->content}, created: {$msg->created_at}");
-        }
+        \Log::info('🧹 Mensagens do backend para a sala '.$room->id.':', $messages->pluck('created_at', 'id')->toArray());
 
         return Inertia::render('Chat/Room', [
             'room' => $room->load(['users', 'creator']),
-            'messages' => fn () => $messages, // força lazy evaluation
-        ])->withViewData(['ts' => now()]); // quebra cache do inertia
+            'messages' => $messages,
+        ]);
     }
 
 
