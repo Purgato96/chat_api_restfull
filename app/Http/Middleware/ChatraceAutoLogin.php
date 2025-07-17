@@ -42,7 +42,7 @@ class ChatraceAutoLogin
 
         // Cria ou busca a sala
         $room = Room::firstOrCreate(
-            ['slug' => 'account-' . $accountId],
+            ['slug' => 'sala-' . $accountId],
             [
                 'name' => 'Espaço #' . $accountId,
                 'description' => 'Sala criada automaticamente para account_id ' . $accountId,
