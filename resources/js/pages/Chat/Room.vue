@@ -292,9 +292,11 @@ const setupEcho = () => {
         .listen('.message.sent', (event) => {
             console.log('📨 Nova mensagem recebida via broadcasting:', event);
 
-            const alreadyExists = localMessages.value.some(msg => msg.id === event.id);
+            const message = event.message;
+
+            const alreadyExists = localMessages.value.some(msg => msg.id === message.id);
             if (!alreadyExists) {
-                localMessages.value.push(event);
+                localMessages.value.push(message);
                 scrollToBottom();
             }
         })
