@@ -158,8 +158,6 @@
 <script setup>
 import { ref, computed, nextTick, onMounted, onUnmounted, watchEffect, watch } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
-import ChatLayout from '@/layouts/ChatLayout.vue';
-import RoomUserManager from '@/components/RoomUserManager.vue';
 
 const props = defineProps({
     room: Object,
@@ -168,6 +166,7 @@ const props = defineProps({
 
 const { props: pageProps } = usePage();
 
+// ESTADOS
 const newMessage = ref('');
 const isSending = ref(false);
 const messagesContainer = ref(null);
@@ -176,11 +175,23 @@ const connectionStatus = ref('disconnected');
 const localMessages = ref([]);
 const editingMessage = ref(null);
 const editMessageContent = ref('');
+const propsInitialized = ref(false);
 
+// COMPUTEDS
 const canManageUsers = computed(() => {
     return props.room.created_by === pageProps.auth.user.id;
 });
 
+// SCROLL
+const scrollToBottom = () => {
+    nextTick(() => {
+        if (messagesContainer.value) {
+            messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+        }
+    });
+};
+
+// ENVIO
 const sendMessage = async () => {
     if (!newMessage.value.trim()) return;
     isSending.value = true;
@@ -202,6 +213,7 @@ const sendMessage = async () => {
     }
 };
 
+// EDIÇÃO
 const cancelEdit = () => {
     editingMessage.value = null;
     editMessageContent.value = '';
@@ -253,6 +265,7 @@ const leaveRoom = async () => {
     }
 };
 
+// FORMATAÇÃO
 const formatTime = (timestamp) => {
     return new Date(timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 };
@@ -261,15 +274,7 @@ const formatDate = (timestamp) => {
     return new Date(timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
-const scrollToBottom = () => {
-    nextTick(() => {
-        if (messagesContainer.value) {
-            messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
-        }
-    });
-};
-
-// WebSocket
+// ECHO
 let echoChannel = null;
 
 const cleanupEcho = () => {
@@ -290,11 +295,9 @@ const setupEcho = () => {
 
     echoChannel = window.Echo.private(`room.${props.room.slug}`)
         .listen('.message.sent', (event) => {
-            console.log('📨 Nova mensagem recebida via broadcasting:', event);
+            console.log('📨 Nova mensagem via broadcasting:', event);
 
-            // evento já vem FLAT, então usamos ele direto
             const alreadyExists = localMessages.value.some(msg => msg.id === event.id);
-
             if (!alreadyExists) {
                 localMessages.value.push(event);
                 scrollToBottom();
@@ -324,6 +327,7 @@ const setupEcho = () => {
     }
 };
 
+// CICLO DE VIDA
 onMounted(() => {
     scrollToBottom();
     cleanupEcho();
@@ -334,20 +338,22 @@ onUnmounted(() => {
     cleanupEcho();
 });
 
-// WATCHERS
+// WATCHES
 watch(() => props.room.slug, (newSlug) => {
-    console.log('🔄 Sala mudou:', newSlug);
-    localMessages.value = [...props.messages];
-    scrollToBottom();
-}, { immediate: true });
+    console.log('🔄 Sala mudou para:', newSlug);
+    propsInitialized.value = false; // Permite recarregar as mensagens da nova sala
+});
 
+// Carrega mensagens do props apenas uma vez (evita sobrescrever)
 watchEffect(() => {
-    if (props.messages?.length) {
-        localMessages.value = props.messages.map(m => ({ ...m, fromCache: false }));
-        console.log('🔄 Atualizando mensagens locais:', localMessages.value);
+    if (!propsInitialized.value && props.messages?.length) {
+        localMessages.value = props.messages.map(m => ({ ...m }));
+        console.log('✅ Mensagens iniciais carregadas:', localMessages.value);
+        propsInitialized.value = true;
         scrollToBottom();
     }
 });
 </script>
+
 
 
