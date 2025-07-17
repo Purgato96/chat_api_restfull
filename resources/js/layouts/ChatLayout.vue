@@ -1,8 +1,8 @@
 <template>
     <div class="flex h-screen bg-gray-50">
-        <!-- Sidebar de Mensagens Privadas -->
+        <!-- Sidebar de Mensagens Privadas
         <PrivateRoomsSidebar />
-
+-->
         <!-- Conteúdo principal -->
         <div class="flex-1 overflow-y-auto">
             <slot />
