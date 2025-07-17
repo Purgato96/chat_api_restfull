@@ -288,16 +288,20 @@ const setupEcho = () => {
 
     console.log('🚀 Configurando Laravel Echo para a sala:', props.room.slug);
 
-    echoChannel = window.Echo.private(room.${props.room.slug})
-.listen('.message.sent', (event) => {
-        console.log('📨 Nova mensagem recebida via broadcasting:', event);
+    echoChannel = window.Echo.private(`room.${props.room.slug}`)
+        .listen('.message.sent', (event) => {
+            console.log('📨 Nova mensagem recebida via broadcasting:', event);
 
-        const alreadyExists = localMessages.value.some(msg => msg.id === event.id);
-        if (!alreadyExists) {
-            localMessages.value.push(event);
-            scrollToBottom();
-        }
-    })
+            // evento já vem FLAT, então usamos ele direto
+            const alreadyExists = localMessages.value.some(msg => msg.id === event.id);
+
+            if (!alreadyExists) {
+                localMessages.value.push(event);
+                scrollToBottom();
+            } else {
+                console.log('🔁 Mensagem já existia, ignorada:', event.id);
+            }
+        })
         .subscribed(() => {
             console.log('✅ Inscrito no canal da sala com sucesso');
             connectionStatus.value = 'connected';
