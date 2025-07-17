@@ -62,7 +62,6 @@ class RoomController extends Controller
 
     public function show(Room $room): Response
     {
-        // Verifica se o usuário tem acesso à sala
         if (!$room->users()->where('user_id', auth()->id())->exists()) {
             abort(403, 'Você não tem acesso a esta sala.');
         }
@@ -74,12 +73,18 @@ class RoomController extends Controller
             ->get()
             ->reverse()
             ->values();
-        \Log::info('Mensagens carregadas:', $messages->toArray());
+
+        \Log::info('🧹 MENSAGENS DO BACKEND:');
+        foreach ($messages as $msg) {
+            \Log::info("-> ID: {$msg->id}, content: {$msg->content}, created: {$msg->created_at}");
+        }
+
         return Inertia::render('Chat/Room', [
-            'room' => $room->load(['users', 'creator']), // Adiciona o criador aqui
-            'messages' => $messages,
-        ]);
+            'room' => $room->load(['users', 'creator']),
+            'messages' => fn () => $messages, // força lazy evaluation
+        ])->withViewData(['ts' => now()]); // quebra cache do inertia
     }
+
 
     public function store(Request $request)
     {
