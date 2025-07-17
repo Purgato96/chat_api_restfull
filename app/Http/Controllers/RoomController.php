@@ -60,16 +60,14 @@ class RoomController extends Controller
         ]);
     }*/
 
-    public function show(Room $room): \Inertia\Response
+    public function show(Room $room): \Illuminate\Http\Response
     {
         if (!$room->users()->where('user_id', auth()->id())->exists()) {
             abort(403, 'Você não tem acesso a esta sala.');
         }
 
-        // Loga o ID da sala
         \Log::info("🔍 RoomController@show carregando sala ID: {$room->id}");
 
-        // Carrega mensagens EXCLUSIVAMENTE da sala correta
         $messages = \App\Models\Message::query()
             ->where('room_id', $room->id)
             ->with('user')
@@ -86,10 +84,14 @@ class RoomController extends Controller
             'room_id' => $m->room_id,
         ])->toArray());
 
-        return Inertia::render('Chat/Room', [
-            'room' => $room->load(['users', 'creator']),
-            'messages' => $messages,
-        ]);
+        return response(
+            Inertia::render('Chat/Room', [
+                'room' => $room,
+                'messages' => $messages,
+            ])->withViewData([
+                'no-cache' => true
+            ])
+        )->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     }
 
 
