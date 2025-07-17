@@ -87,9 +87,11 @@ class RoomController extends Controller
         ])->toArray());
 
         return Inertia::render('Chat/Room', [
-            'room' => $room->load(['users', 'creator']),
+            'room' => $room,
             'messages' => $messages,
-        ]);
+        ])->withViewData([
+            'no-cache' => true
+        ])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     }
 
 
