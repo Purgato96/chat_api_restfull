@@ -60,14 +60,16 @@ class RoomController extends Controller
         ]);
     }*/
 
-    public function show(Room $room): Response
+    public function show(Room $room): \Inertia\Response
     {
-        // Verifica se o usuário tem acesso à sala
         if (!$room->users()->where('user_id', auth()->id())->exists()) {
             abort(403, 'Você não tem acesso a esta sala.');
         }
 
-        // GARANTE que só pega mensagens da sala correta
+        // Loga o ID da sala
+        \Log::info("🔍 RoomController@show carregando sala ID: {$room->id}");
+
+        // Carrega mensagens EXCLUSIVAMENTE da sala correta
         $messages = \App\Models\Message::query()
             ->where('room_id', $room->id)
             ->with('user')
@@ -77,7 +79,12 @@ class RoomController extends Controller
             ->reverse()
             ->values();
 
-        \Log::info('🧹 Mensagens do backend para a sala '.$room->id.':', $messages->pluck('created_at', 'id')->toArray());
+        \Log::info("🧹 Mensagens retornadas:", $messages->map(fn($m) => [
+            'id' => $m->id,
+            'content' => $m->content,
+            'created_at' => $m->created_at,
+            'room_id' => $m->room_id,
+        ])->toArray());
 
         return Inertia::render('Chat/Room', [
             'room' => $room->load(['users', 'creator']),
