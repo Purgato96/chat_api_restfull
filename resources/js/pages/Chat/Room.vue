@@ -301,16 +301,24 @@ const setupEcho = () => {
         .listen('.message.sent', (event) => {
             console.log('📨 Nova mensagem recebida via broadcasting:', event);
 
-            localMessages.value.push({
-                id: event.id,
-                content: event.content,
-                room_id: event.room_id,
-                created_at: event.created_at,
-                edited_at: event.edited_at,
-                user: event.user
-            });
+            // Verifica se essa mensagem já existe pelo ID
+            const alreadyExists = localMessages.value.some(
+                (msg) => msg.id === event.id
+            );
 
-            scrollToBottom();
+            if (!alreadyExists) {
+                localMessages.value.push({
+                    id: event.id,
+                    content: event.content,
+                    room_id: event.room_id,
+                    created_at: event.created_at,
+                    edited_at: event.edited_at,
+                    user: event.user
+                });
+                scrollToBottom();
+            } else {
+                console.log(`⚠️ Mensagem ID ${event.id} já existe, ignorando duplicata.`);
+            }
         })
         .subscribed(() => {
             console.log('✅ Inscrito no canal da sala com sucesso');

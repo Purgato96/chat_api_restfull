@@ -69,12 +69,12 @@ onMounted(() => {
                     :key="room.id"
                     @click="openRoom(room)"
                     :class="[
-            'flex items-center space-x-2 cursor-pointer hover:bg-gray-100 p-2',
-            room.slug === currentRoomSlug ? 'bg-blue-50' : ''
+            'flex items-center space-x-2 cursor-pointer p-2 rounded text-black',
+                        room.slug === activeRoomSlug ? 'bg-blue-100 text-blue-700 font-semibold' : 'hover:bg-gray-100'
           ]"
                 >
                     <span class="text-gray-600">🔒</span>
-                    <span class="text-sm font-medium text-gray-700">{{ room.name }}</span>
+                    <span class="text-sm">{{ room.name }}</span>
                 </li>
                 <li v-if="privateRooms.length === 0" class="text-sm text-gray-500 p-2">
                     Nenhuma conversa privada.
