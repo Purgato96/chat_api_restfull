@@ -179,7 +179,8 @@ const messagesContainer = ref(null);
 const showUserManager = ref(false);
 const connectionStatus = ref('disconnected');
 
-const localMessages = ref([...props.messages]);
+/**const localMessages = ref([...props.messages]);**/
+const localMessages = ref([]);
 
 const editingMessage = ref(null);
 const editMessageContent = ref('');
@@ -288,7 +289,8 @@ const scrollToBottom = () => {
 };
 
 let echoChannel = null;
-
+cleanupEcho(); // sempre desconecta antes de conectar de novo
+setTimeout(setupEcho, 100);
 const setupEcho = () => {
     if (!window.Echo) {
         console.error('❌ Laravel Echo não está disponível');
@@ -362,11 +364,14 @@ onUnmounted(() => {
 import { watch } from 'vue';
 
 watch(
-    () => props.messages,
-    (newMessages) => {
-        console.log('📥 props.messages mudou, atualizando localMessages.');
-        localMessages.value = [...newMessages];
-        scrollToBottom();
+    () => props.room.slug,
+    (newSlug) => {
+        console.log('🔄 Sala mudou para:', newSlug, 'Resetando mensagens');
+        localMessages.value = [];
+        nextTick(() => {
+            localMessages.value = [...props.messages];
+            scrollToBottom();
+        });
     },
     { immediate: true }
 );
