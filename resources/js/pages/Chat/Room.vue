@@ -156,22 +156,18 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
+import { ref, computed, nextTick, onMounted, onUnmounted, watch, watchEffect } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import ChatLayout from '@/layouts/ChatLayout.vue';
 import RoomUserManager from '@/components/RoomUserManager.vue';
 
 const props = defineProps({
-    room: {
-        type: Object,
-        required: true
-    },
-    messages: {
-        type: Array,
-        required: true
-    }
+    room: { type: Object, required: true },
+    messages: { type: Array, required: true }
 });
+
 const { props: pageProps } = usePage();
+const page = usePage();
 
 const newMessage = ref('');
 const isSending = ref(false);
@@ -179,7 +175,6 @@ const messagesContainer = ref(null);
 const showUserManager = ref(false);
 const connectionStatus = ref('disconnected');
 
-/**const localMessages = ref([...props.messages]);**/
 const localMessages = ref([]);
 
 const editingMessage = ref(null);
@@ -289,8 +284,7 @@ const scrollToBottom = () => {
 };
 
 let echoChannel = null;
-cleanupEcho(); // sempre desconecta antes de conectar de novo
-setTimeout(setupEcho, 100);
+
 const setupEcho = () => {
     if (!window.Echo) {
         console.error('❌ Laravel Echo não está disponível');
@@ -303,11 +297,7 @@ const setupEcho = () => {
         .listen('.message.sent', (event) => {
             console.log('📨 Nova mensagem recebida via broadcasting:', event);
 
-            // Verifica se essa mensagem já existe pelo ID
-            const alreadyExists = localMessages.value.some(
-                (msg) => msg.id === event.id
-            );
-
+            const alreadyExists = localMessages.value.some(msg => msg.id === event.id);
             if (!alreadyExists) {
                 localMessages.value.push({
                     id: event.id,
@@ -353,6 +343,7 @@ const cleanupEcho = () => {
 };
 
 onMounted(() => {
+    cleanupEcho();
     scrollToBottom();
     setTimeout(setupEcho, 100);
 });
@@ -361,12 +352,23 @@ onUnmounted(() => {
     cleanupEcho();
 });
 
-import { watch } from 'vue';
+// Atualiza localMessages quando props.messages muda
+watchEffect(() => {
+    if (props.messages?.length) {
+        localMessages.value = props.messages.map(m => ({
+            ...m,
+            fromCache: false
+        }));
+        console.log('🔄 Atualizando localMessages por props.messages:', localMessages.value);
+        scrollToBottom();
+    }
+});
 
+// Reseta mensagens quando troca de sala
 watch(
     () => props.room.slug,
     (newSlug) => {
-        console.log('🔄 Sala mudou para:', newSlug, 'Resetando mensagens');
+        console.log('🔁 Mudou de sala para:', newSlug);
         localMessages.value = [];
         nextTick(() => {
             localMessages.value = [...props.messages];
@@ -375,20 +377,6 @@ watch(
     },
     { immediate: true }
 );
-import { watchEffect } from 'vue';
-
-const page = usePage();
-
-watchEffect(() => {
-    if (props.messages?.length) {
-        localMessages.value = props.messages.map(m => ({
-            ...m,
-            fromCache: false // só pra debug
-        }));
-        console.log('🔄 Atualizando localMessages por props.messages:', localMessages.value);
-        scrollToBottom();
-    }
-});
 </script>
 
 
