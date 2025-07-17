@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Room;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class ChatraceAutoLogin
 {
@@ -27,7 +28,6 @@ class ChatraceAutoLogin
         if (!$email || !$accountId) {
             abort(403, 'Missing email or account_id');
         }
-        //dump($email, $accountId);
 
         // Procura ou cria o usuário
         $user = User::firstOrCreate(
@@ -37,7 +37,11 @@ class ChatraceAutoLogin
 
         Auth::login($user);
 
-        // Procura ou cria a sala para esse account_id
+        // Limpa sessão antiga e força nova
+        session()->flush();
+        session()->regenerate();
+
+        // Procura ou cria a sala
         $room = Room::firstOrCreate(
             ['slug' => 'account-' . $accountId],
             [
@@ -53,7 +57,11 @@ class ChatraceAutoLogin
             $room->users()->attach($user->id, ['joined_at' => now()]);
         }
 
-        // Redireciona para a sala
-        return redirect()->route('rooms.show', $room->slug);
+        // Redireciona com headers anti-cache
+        return redirect()
+            ->route('rooms.show', $room->slug)
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
     }
 }
