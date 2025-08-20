@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MessageApiController;
+use App\Http\Controllers\Api\PrivateConversationController;
+use App\Http\Controllers\Api\PrivateMessageController;
 use App\Http\Controllers\Api\RoomApiController;
 use App\Http\Controllers\Api\WebSocketAuthController;
 use Illuminate\Http\Request;
@@ -60,6 +62,16 @@ Route::prefix('v1')->name('api.')->middleware(['auth:sanctum', 'throttle:api'])-
     Route::delete('/messages/{message}', [MessageApiController::class, 'destroy']);
 
     Route::get('rooms/private/all', [RoomApiController::class, 'myPrivateRooms']);
+
+    // Rotas para conversas privadas
+    Route::get('/private-conversations', [PrivateConversationController::class, 'index']);
+    Route::post('/private-conversations', [PrivateConversationController::class, 'start']);
+    Route::get('/private-conversations/{conversation}', [PrivateConversationController::class, 'show']);
+
+    // Rotas para mensagens privadas
+    Route::post('/private-conversations/{conversation}/messages', [PrivateMessageController::class, 'store']);
+    Route::put('/private-conversations/{conversation}/messages/{message}', [PrivateMessageController::class, 'update']);
+    Route::post('/private-conversations/{conversation}/messages/{message}/read', [PrivateMessageController::class, 'markAsRead']);
 
 });
 
