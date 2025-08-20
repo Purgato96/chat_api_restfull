@@ -109,4 +109,26 @@ class User extends Authenticatable
             ->orWhereNull('last_used_at')
             ->get();
     }
+
+    public function privateConversationsAsUserOne()
+    {
+        return $this->hasMany(PrivateConversation::class, 'user_one_id');
+    }
+
+    public function privateConversationsAsUserTwo()
+    {
+        return $this->hasMany(PrivateConversation::class, 'user_two_id');
+    }
+
+    public function privateConversations()
+    {
+        return $this->privateConversationsAsUserOne()
+            ->union($this->privateConversationsAsUserTwo());
+    }
+
+    public function sentPrivateMessages()
+    {
+        return $this->hasMany(PrivateMessage::class, 'sender_id');
+    }
+
 }
