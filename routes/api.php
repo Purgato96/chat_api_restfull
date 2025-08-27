@@ -9,89 +9,87 @@ use App\Http\Controllers\Api\WebSocketAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-
-// Rotas públicas (sem autenticação)
+// =====================
+// Rotas públicas (sem auth)
+// =====================
 Route::prefix('v1')->name('api.')->group(function () {
-
     // Autenticação
     Route::post('/auth/login', [AuthController::class, 'login']);
     Route::post('/auth/register', [AuthController::class, 'register']);
 
-    // Salas públicas (apenas listagem e visualização)
+    // Salas públicas
     Route::get('/rooms', [RoomApiController::class, 'index']);
-    Route::get('/rooms/{room}', [RoomApiController::class, 'show']);
-    Route::get('/rooms/{room}/members', [RoomApiController::class, 'members']);
-    Route::get('/rooms/{room}/messages', [MessageApiController::class, 'index']);
-    Route::get('/rooms/{room}/messages/search', [MessageApiController::class, 'search']);
+    Route::get('/rooms/{room:slug}', [RoomApiController::class, 'show']);
+    Route::get('/rooms/{room:slug}/members', [RoomApiController::class, 'members']);
+    Route::get('/rooms/{room:slug}/messages', [MessageApiController::class, 'index']);
+    Route::get('/rooms/{room:slug}/messages/search', [MessageApiController::class, 'search']);
+
+    // Mensagem pública específica
     Route::get('/messages/{message}', [MessageApiController::class, 'show']);
 });
 
-// Rotas protegidas (requer autenticação)
+// =====================
+// Rotas protegidas (auth:sanctum)
+// =====================
 Route::prefix('v1')->name('api.')->middleware(['auth:sanctum', 'throttle:api'])->group(function () {
-
     // Autenticação
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/logout-all', [AuthController::class, 'logoutAll']);
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
     Route::get('/auth/me', [AuthController::class, 'me']);
 
-    // Salas - CRUD completo
-    Route::apiResource('rooms', RoomApiController::class);
-    Route::post('/rooms/{room}/join', [RoomApiController::class, 'join']);
-    Route::delete('/rooms/{room}/leave', [RoomApiController::class, 'leave']);
-    Route::get('/rooms/{room}/members', [RoomApiController::class, 'members']);
+    // Salas (ações autenticadas)
+    Route::post('/rooms/{room:slug}/join', [RoomApiController::class, 'join']);
+    Route::delete('/rooms/{room:slug}/leave', [RoomApiController::class, 'leave']);
+    Route::get('/rooms/{room:slug}/members', [RoomApiController::class, 'members']);
+    // Alias opcional para compatibilidade do front:
+    Route::get('/rooms/{room:slug}/users', [RoomApiController::class, 'members']);
 
-    // Mensagens - CRUD completo
+    // Mensagens (CRUD parcial via sala)
     Route::apiResource('rooms.messages', MessageApiController::class, [
-        'except' => ['index', 'show'] // Já definidos nas rotas públicas
+        'except' => ['index', 'show'] // já definidos acima nas públicas
     ]);
-    Route::get('/rooms/{room}/messages/search', [MessageApiController::class, 'search']);
+    Route::get('/rooms/{room:slug}/messages/search', [MessageApiController::class, 'search']);
 
-    // Rotas diretas para mensagens (sem precisar da sala)
+    // Rotas diretas para mensagens
     Route::put('/messages/{message}', [MessageApiController::class, 'update']);
     Route::delete('/messages/{message}', [MessageApiController::class, 'destroy']);
 
+    // Minhas salas privadas
     Route::get('rooms/private/all', [RoomApiController::class, 'myPrivateRooms']);
 
-    // Rotas para conversas privadas
+    // Conversas privadas
     Route::get('/private-conversations', [PrivateConversationController::class, 'index']);
     Route::post('/private-conversations', [PrivateConversationController::class, 'start']);
     Route::get('/private-conversations/{conversation}', [PrivateConversationController::class, 'show']);
 
-    // Rotas para mensagens privadas
+    // Mensagens privadas
     Route::post('/private-conversations/{conversation}/messages', [PrivateMessageController::class, 'store']);
     Route::put('/private-conversations/{conversation}/messages/{message}', [PrivateMessageController::class, 'update']);
     Route::post('/private-conversations/{conversation}/messages/{message}/read', [PrivateMessageController::class, 'markAsRead']);
-
 });
 
-// Rota para autenticação do broadcasting (WebSocket)
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::post('/broadcasting/auth', function (Request $request) {
-        return response()->json([
-            'auth' => auth()->user() ? auth()->user()->id : null,
-        ]);
-    });
+// =====================
+// Broadcasting auth (Sanctum)
+// =====================
+Route::middleware(['auth:sanctum'])->post('/broadcasting/auth', function (Request $request) {
+    return response()->json([
+        'auth' => optional($request->user())->id,
+    ]);
 });
 
-// Rotas de autenticação WebSocket para clientes externos
+// =====================
+// WebSocket endpoints auxiliares
+// =====================
 Route::prefix('v1')->group(function () {
     Route::post('/websocket/auth', [WebSocketAuthController::class, 'authenticate']);
     Route::get('/websocket/channels', [WebSocketAuthController::class, 'channels']);
     Route::get('/websocket/test', [WebSocketAuthController::class, 'test']);
 });
 
-// Rota de status da API
+// =====================
+// Status + fallback
+// =====================
 Route::get('/v1/status', function () {
     return response()->json([
         'status' => 'online',
@@ -106,17 +104,17 @@ Route::get('/v1/status', function () {
     ]);
 });
 
-// Fallback para rotas não encontradas
+Route::get('/v1/test', function (Request $request) {
+    return response()->json([
+        'auth_guard' => config('auth.defaults.guard'),
+        'user' => $request->user(),
+    ]);
+});
+
 Route::fallback(function () {
     return response()->json([
         'error' => 'Endpoint não encontrado',
         'message' => 'A rota solicitada não existe. Consulte a documentação da API.',
         'documentation' => '/api/v1/status'
     ], 404);
-});
-Route::get('/v1/test', function (\Illuminate\Http\Request $request) {
-    return response()->json([
-        'auth_guard' => config('auth.defaults.guard'),
-        'user' => $request->user(),
-    ]);
 });

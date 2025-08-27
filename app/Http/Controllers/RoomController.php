@@ -224,21 +224,15 @@ class RoomController extends Controller
      */
     public function getAvailableUsers(Room $room)
     {
-        // Verifica se o usuário atual é o criador da sala
-        if ($room->created_by !== auth()->id()) {
-            abort(403, 'Apenas o criador da sala pode ver usuários disponíveis.');
-        }
-
-        // Busca usuários que não estão na sala
-        $usersInRoom = $room->users()->pluck('users.id');
-        $availableUsers = \App\Models\User::whereNotIn('id', $usersInRoom)
-            ->select('id', 'name', 'email')
+        // Retorna apenas os usuários que fazem parte da sala
+        $users = $room
+            ->users()
+            ->select('users.id', 'users.name', 'users.email')
             ->get();
 
-        return response()->json([
-            'available_users' => $availableUsers,
-        ]);
+        return response()->json($users);
     }
+
 
     public function list(): Response
     {
