@@ -358,7 +358,7 @@ const selectPrivateConversation = async (conversation) => {
     currentPrivateConversation.value = conversation;
 
     try {
-        const response = await axios.get(`/api/v1/private-conversations/${conversation.id}`);
+        const response = await axios.get(`/chat/private-conversations/${conversation.id}`);
         currentPrivateMessages.value = response.data.messages;
 
         await nextTick();
@@ -490,13 +490,13 @@ const sendMessage = async () => {
         } else if (currentPrivateConversation.value) {
             // Enviar mensagem privada
             const response = await axios.post(
-                `/api/v1/private-conversations/${currentPrivateConversation.value.id}/messages`,
+                `/chat/private-conversations/${currentPrivateConversation.value.id}/messages`,
                 {
                     content: newMessage.value
                 }
             );
 
-            currentPrivateMessages.value.push(response.data);
+            /*currentPrivateMessages.value.push(response.data);*/
 
             // Atualizar a lista de conversas
             await loadPrivateConversations();
