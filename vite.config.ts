@@ -34,4 +34,8 @@ export default defineConfig({
         vue({ template: { transformAssetUrls: { base: null, includeAbsolute: false } } }),
     ],
     resolve: { alias: { '@': path.resolve(__dirname, './resources/js') } },
+
+    build: {
+        target: 'esnext'  // <-- Adicione esta linha para suporte a top-level await
+    },
 })
