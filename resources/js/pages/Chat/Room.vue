@@ -115,7 +115,7 @@
                                             @input="handleInput"
                                             @keydown="handleKeydown"
                                             :placeholder="getPlaceholderText"
-                                            class="w-full text-black px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                                            class="w-full text-black px-3 py-4 border rounded-md focus:ring-2 focus:ring-blue-500"
                                             :disabled="isSending || (activeTab === 'private' && !currentPrivateConversation)"
                                         />
                                         <div v-if="showMentionDropdown && mentionUsers.length"
@@ -150,23 +150,6 @@
                             <RoomUserManager :room="room" />
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <!-- Modal de edição de mensagem -->
-        <div v-if="editingMessage" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                <h3 class="text-lg font-semibold mb-4">Editar Mensagem</h3>
-                <textarea v-model="editMessageContent"
-                          class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                          rows="3"></textarea>
-                <div class="flex justify-end space-x-3 mt-4">
-                    <button @click="cancelEdit" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">Cancelar
-                    </button>
-                    <button @click="updateMessage" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                            :disabled="!editMessageContent.trim() || isSending">
-                        {{ isSending ? 'Salvando...' : 'Salvar' }}
-                    </button>
                 </div>
             </div>
         </div>
