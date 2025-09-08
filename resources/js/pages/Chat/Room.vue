@@ -68,36 +68,57 @@
                         <!-- Área do chat -->
                         <div class="flex-1 flex flex-col h-96">
                             <div ref="messagesContainer" class="flex-1 overflow-y-auto p-6 space-y-4">
-                                <div v-if="activeTab === 'public'" v-for="m in localMessages" :key="m.id"
-                                     class="flex flex-col">
-                                    <div :class="m.user.id === user.id ? msgSent : msgRecv"
-                                         class="max-w-xs md:max-w-sm lg:max-w-md rounded-lg shadow px-4 py-2">
-                                        <div class="flex items-center space-x-2 mb-1">
-                                            <span class="text-xs font-semibold">{{ m.user.name }}</span>
-                                            <span class="text-[10px] font-bold">{{ formatDate(m.created_at)
-                                                }} - {{ formatTime(m.created_at) }}</span>
-                                            <span v-if="m.edited_at" class="text-[10px] text-gray-400">(editada)</span>
-                                        </div>
-                                        <p class="text-sm break-words">{{ m.content }}</p>
-                                    </div>
-                                </div>
-                                <div v-if="activeTab === 'private' && currentPrivateConversation">
-                                    <div v-for="m in currentPrivateMessages" :key="m.id" class="flex flex-col">
-                                        <div :class="m.sender.id === user.id ? msgSent : msgRecv"
-                                             class="max-w-xs md:max-w-sm lg:max-w-md rounded-lg shadow px-4 py-2">
+                                <!-- Mensagens públicas -->
+                                <template v-if="activeTab === 'public'">
+                                    <div
+                                        v-for="m in localMessages"
+                                        :key="m.id"
+                                        class="flex flex-col"
+                                    >
+                                        <div
+                                            :class="m.user.id === user.id ? msgSent : msgRecv"
+                                            class="max-w-xs md:max-w-sm lg:max-w-md rounded-lg shadow px-4 py-2"
+                                        >
                                             <div class="flex items-center space-x-2 mb-1">
-                                                <span class="text-xs font-semibold">{{ m.sender.name }}</span>
-                                                <span class="text-[10px] font-bold">{{ formatDate(m.created_at)
-                                                    }} - {{ formatTime(m.created_at) }}</span>
-                                                <span v-if="m.is_edited"
-                                                      class="text-[10px] text-gray-400">(editada)</span>
+                                                <span class="text-xs font-semibold">{{ m.user.name }}</span>
+                                                <span class="text-[10px] font-bold">
+              {{ formatDate(m.created_at) }} - {{ formatTime(m.created_at) }}
+            </span>
+                                                <span v-if="m.edited_at" class="text-[10px] text-gray-400">(editada)</span>
                                             </div>
                                             <p class="text-sm break-words">{{ m.content }}</p>
                                         </div>
                                     </div>
-                                </div>
-                                <div v-if="activeTab === 'private' && !currentPrivateConversation"
-                                     class="flex items-center justify-center h-full text-gray-500">
+                                </template>
+
+                                <!-- Mensagens privadas -->
+                                <template v-if="activeTab === 'private' && currentPrivateConversation">
+                                    <div
+                                        v-for="m in currentPrivateMessages"
+                                        :key="m.id"
+                                        class="flex flex-col"
+                                    >
+                                        <div
+                                            :class="m.sender.id === user.id ? msgSent : msgRecv"
+                                            class="max-w-xs md:max-w-sm lg:max-w-md rounded-lg shadow px-4 py-2"
+                                        >
+                                            <div class="flex items-center space-x-2 mb-1">
+                                                <span class="text-xs font-semibold">{{ m.sender.name }}</span>
+                                                <span class="text-[10px] font-bold">
+              {{ formatDate(m.created_at) }} - {{ formatTime(m.created_at) }}
+            </span>
+                                                <span v-if="m.is_edited" class="text-[10px] text-gray-400">(editada)</span>
+                                            </div>
+                                            <p class="text-sm break-words">{{ m.content }}</p>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <!-- Placeholder sem conversa privada selecionada -->
+                                <div
+                                    v-if="activeTab === 'private' && !currentPrivateConversation"
+                                    class="flex items-center justify-center h-full text-gray-500"
+                                >
                                     <div class="text-center">
                                         <p class="text-lg mb-2">💬</p>
                                         <p>Selecione uma conversa</p>
@@ -105,7 +126,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Formulário -->
+
+                            <!-- Formulário de envio -->
                             <div class="border-t p-4 bg-white">
                                 <form @submit.prevent="sendMessage" class="flex space-x-2">
                                     <div class="flex-1 relative">
@@ -118,13 +140,20 @@
                                             class="w-full text-black px-3 py-4 border rounded-md focus:ring-2 focus:ring-blue-500"
                                             :disabled="isSending || (activeTab === 'private' && !currentPrivateConversation)"
                                         />
-                                        <div v-if="showMentionDropdown && mentionUsers.length"
-                                             class="absolute bottom-full left-0 right-0 bg-white border shadow-lg max-h-48 overflow-y-auto z-10 mb-1">
-                                            <div v-for="(u, i) in mentionUsers" :key="u.id" @click="selectMention(u)"
-                                                 :class="['p-3 hover:bg-gray-50 cursor-pointer', selectedMentionIndex === i ? 'bg-blue-50' : '']">
+                                        <div
+                                            v-if="showMentionDropdown && mentionUsers.length"
+                                            class="absolute bottom-full left-0 right-0 bg-white border shadow-lg max-h-48 overflow-y-auto z-10 mb-1"
+                                        >
+                                            <div
+                                                v-for="(u, i) in mentionUsers"
+                                                :key="u.id"
+                                                @click="selectMention(u)"
+                                                :class="['p-3 hover:bg-gray-50 cursor-pointer', selectedMentionIndex === i ? 'bg-blue-50' : '']"
+                                            >
                                                 <div class="flex items-center">
                                                     <div
-                                                        class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white mr-3">
+                                                        class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white mr-3"
+                                                    >
                                                         {{ u.name.charAt(0).toUpperCase() }}
                                                     </div>
                                                     <div>
@@ -135,14 +164,17 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="submit"
-                                            :disabled="!newMessage.trim() || isSending || (activeTab === 'private' && !currentPrivateConversation)"
-                                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50">
+                                    <button
+                                        type="submit"
+                                        :disabled="!newMessage.trim() || isSending || (activeTab === 'private' && !currentPrivateConversation)"
+                                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                                    >
                                         {{ isSending ? 'Enviando...' : 'Enviar' }}
                                     </button>
                                 </form>
                             </div>
                         </div>
+
 
                         <!-- Gerenciamento de usuários da sala -->
                         <div v-if="showUserManager && canManageUsers && activeTab === 'public'"
@@ -396,9 +428,10 @@ function setupEcho() {
     if (!window.Echo) return;
     echoChannel = window.Echo.private(`room.${props.room.slug}`)
         .listen('.message.sent', e => {
-            if (activeTab.value === 'public' && !localMessages.value.some(m => m.id === e.id)) {
+            if (!localMessages.value.some(m => m.id === e.id)) {
                 localMessages.value.push(e);
-                scrollToBottom();
+                // só faz scroll se estiver na aba pública
+                if (activeTab.value === 'public') scrollToBottom();
             }
         })
         .subscribed(() => connectionStatus.value = 'connected')
